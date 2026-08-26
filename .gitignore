@@ -8,3 +8,11 @@ __pycache__/
 .DS_Store
 Thumbs.db
 .tmp_scan/
+
+# 会话临时工具（含密钥，不入库）
+99-系统与规则/_tencent_api.py
+99-系统与规则/_deploy_bridge.py
+99-系统与规则/_test_asr*.py
+99-系统与规则/_asr_test*.wav
+99-系统与规则/_*.zip
+

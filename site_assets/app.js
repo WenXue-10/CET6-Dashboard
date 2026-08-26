@@ -310,22 +310,63 @@ document.addEventListener("keydown", function(e){ if(e.key==="Escape") closeModa
 var BRIDGE = { url:"https://1473705102-38601bi8ym.ap-shanghai.tencentscf.com", key:"0606" };
 try{ var _brid=JSON.parse(localStorage.getItem("cet6_bridge")||"null"); if(_brid&&_brid.url) BRIDGE=_brid; }catch(e){}
 
-/* ---------- 语音识别（Web Speech API，安卓 Chrome / 桌面 Chrome 支持） ---------- */
+/* ---------- 一键录音（Web Audio → WAV → 腾讯云一句话识别，iPhone/安卓都可用） ---------- */
+var _rec = null;
 function startVoice(inputId, lang){
-  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){ toast("当前浏览器不支持语音识别，请用安卓 Chrome"); return; }
-  var r=new SR(); r.lang=lang||"zh-CN"; r.interimResults=false; r.maxAlternatives=1;
-  var btn=document.querySelector("[data-vb='"+inputId+"']");
-  if(btn){ btn.classList.add("rec"); btn.textContent="🔴"; }
-  r.onresult=function(e){
-    var t=e.results[0][0].transcript||"";
-    var inp=document.getElementById(inputId);
-    if(inp&&t){ inp.value=inp.value?inp.value+" "+t:t; }
-    toast("已识别："+t);
-  };
-  r.onend=function(){ if(btn){ btn.classList.remove("rec"); btn.textContent="🎤"; } };
-  r.onerror=function(e){ if(btn){ btn.classList.remove("rec"); btn.textContent="🎤"; } toast("语音识别失败："+(e.error||"")); };
-  try{ r.start(); }catch(e){ toast("语音识别启动失败"); }
+  var btn = document.querySelector("[data-vb='"+inputId+"']");
+  if(_rec && _rec.active){ stopRec(null); return; }          // 再点一次 = 停止并识别
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ toast("当前浏览器不支持录音，请用最新版浏览器"); return; }
+  navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+    var ctx=new (window.AudioContext||window.webkitAudioContext)();
+    var src=ctx.createMediaStreamSource(stream);
+    var chunks=[];
+    var proc=ctx.createScriptProcessor(4096,1,1);
+    proc.onaudioprocess=function(e){ chunks.push(new Float32Array(e.inputBuffer.getChannelData(0))); };
+    src.connect(proc); proc.connect(ctx.destination);
+    _rec={ctx:ctx,src:src,proc:proc,chunks:chunks,stream:stream,active:true,inputId:inputId,lang:(lang==="en-US"||lang==="en")?"en":"zh"};
+    if(btn){ btn.classList.add("rec"); btn.textContent="🔴 停止"; }
+    toast("🎙 正在录音…再点一次完成");
+    _rec.timer=setTimeout(function(){ stopRec(null); toast("录音超时已自动结束"); }, 15000);
+  }).catch(function(){ toast("无法访问麦克风，请检查权限"); });
+}
+function stopRec(cb){
+  if(!_rec || !_rec.active) return;
+  var r=_rec; _rec=null; r.active=false;
+  if(r.timer) clearTimeout(r.timer);
+  var btn=document.querySelector("[data-vb='"+r.inputId+"']");
+  if(btn){ btn.classList.remove("rec"); btn.textContent="🎤"; }
+  try{ r.src.disconnect(); r.proc.disconnect(); r.stream.getTracks().forEach(function(t){t.stop();}); if(r.ctx.close) r.ctx.close(); }catch(e){}
+  var sr0=r.ctx.sampleRate||48000, sr=16000;
+  var total=r.chunks.reduce(function(n,c){return n+c.length;},0);
+  if(total<1600){ toast("录音太短，请再试一次"); if(cb)cb(""); return; }
+  var raw=new Float32Array(total), off=0;
+  r.chunks.forEach(function(c){ raw.set(c,off); off+=c.length; });
+  var step=sr0/sr, outLen=Math.floor(total/step);
+  var out=new Int16Array(outLen);
+  for(var i=0;i<outLen;i++){ var v=raw[Math.floor(i*step)]; v=Math.max(-1,Math.min(1,v)); out[i]=v<0?v*0x8000:v*0x7fff; }
+  var b64=base64FromBytes(encodeWav(out,sr));
+  toast("🔍 正在识别…");
+  postBridge({action:"asr",data:b64,format:"wav",lang:r.lang},null,function(res){
+    var text=(res&&res.text||"").trim();
+    var inp=document.getElementById(r.inputId);
+    if(inp&&text){ inp.value=inp.value?inp.value+" "+text:text; toast("已识别："+text); }
+    else{ toast("没识别到内容，请再说一次"); }
+    if(cb)cb(text);
+  });
+}
+function encodeWav(samples,sr){
+  var buf=new ArrayBuffer(44+samples.length*2), dv=new DataView(buf);
+  function ws(o,s){ for(var i=0;i<s.length;i++) dv.setUint8(o+i,s.charCodeAt(i)); }
+  ws(0,"RIFF"); dv.setUint32(4,36+samples.length*2,true); ws(8,"WAVE"); ws(12,"fmt ");
+  dv.setUint32(16,16,true); dv.setUint16(20,1,true); dv.setUint16(22,1,true);
+  dv.setUint32(24,sr,true); dv.setUint32(28,sr*2,true); dv.setUint16(32,2,true); dv.setUint16(34,16,true);
+  ws(36,"data"); dv.setUint32(40,samples.length*2,true);
+  for(var i=0;i<samples.length;i++) dv.setInt16(44+i*2,samples[i],true);
+  return new Uint8Array(buf);
+}
+function base64FromBytes(u8){
+  var bin=""; for(var i=0;i<u8.length;i++) bin+=String.fromCharCode(u8[i]);
+  return btoa(bin);
 }
 
 /* ---------- 拍照 OCR（Tesseract.js，浏览器本地识别） ---------- */
@@ -454,16 +495,17 @@ function markWord(i,status){
   var w=WORDS[i]; if(!w) return;
   postBridge({action:"set_word_status",word:w.word,status:status},status==="已掌握"?"已标记掌握 ✅":"已改回学习中");
 }
-function postBridge(payload,okMsg){
-  if(!BRIDGE.url){ showFallback(payload); return; }
+function postBridge(payload,okMsg,cb){
+  if(!BRIDGE.url){ if(cb){ cb(null); } showFallback(payload); return; }
   var body=JSON.stringify(Object.assign({key:BRIDGE.key},payload));
   fetch(BRIDGE.url,{method:"POST",headers:{"Content-Type":"application/json"},body:body})
     .then(function(r){ return r.json().catch(function(){ return {}; }); })
     .then(function(d){
+      if(cb){ cb(d); return; }
       if(d&&d.ok){ toast((okMsg||"已提交")+"，自动同步后约 1-2 分钟更新"); setTimeout(closeModal,900); }
       else{ toast("保存失败"); showFallback(payload); }
     })
-    .catch(function(){ toast("服务未连接"); showFallback(payload); });
+    .catch(function(){ if(cb){ cb(null); return; } toast("服务未连接"); showFallback(payload); });
 }
 function rowTextFor(payload){
   if(payload.action==="add_word") return "| "+payload.word+" | "+(payload.meaning||"")+" | "+(payload.example||"")+" | 学习中 | 0 | — |";

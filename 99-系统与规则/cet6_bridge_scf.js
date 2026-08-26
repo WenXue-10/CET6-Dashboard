@@ -18,6 +18,7 @@
  */
 'use strict';
 const http = require("http");
+const crypto = require("crypto");
 
 const REPO = "WenXue-10/CET6-Dashboard";
 const BRANCH = "main";
@@ -37,6 +38,42 @@ function decodeB64(s) { return Buffer.from(s, "base64").toString("utf8"); }
 function encodeB64(s) { return Buffer.from(s, "utf8").toString("base64"); }
 function escCell(v) { return String(v == null ? "" : v).replace(/\r?\n/g, " ").replace(/\|/g, "\\|").trim(); }
 function send(res, code, obj) { res.writeHead(code, CORS); res.end(JSON.stringify(obj)); }
+
+/* ---------- 腾讯云一句话识别（ASR）：手机录音 → 文字 ---------- */
+function sha256hex(s) { return crypto.createHash("sha256").update(s).digest("hex"); }
+function hmac(key, msg) { return crypto.createHmac("sha256", key).update(msg).digest(); }
+
+async function tencentAsr(dataB64, format, lang) {
+  const secretId = process.env.TENCENT_SECRET_ID, secretKey = process.env.TENCENT_SECRET_KEY;
+  if (!secretId || !secretKey) return { ok: false, error: "asr not configured" };
+  const host = "asr.tencentcloudapi.com", service = "asr", action = "SentenceRecognition", version = "2019-06-14";
+  const engType = lang === "en" ? "16k_en" : "16k_zh-PY";
+  const payload = {
+    ProjectId: 0, EngSerViceType: engType, SourceType: 1,
+    VoiceFormat: String(format || "wav"),
+    Data: dataB64,
+    DataLen: Buffer.from(dataB64, "base64").length,
+  };
+  const payloadStr = JSON.stringify(payload);
+  const ts = Math.floor(Date.now() / 1000);
+  const date = new Date(ts * 1000).toISOString().slice(0, 10);
+  const ct = "application/json; charset=utf-8";
+  const canonicalRequest = "POST\n/\n\ncontent-type:" + ct + "\nhost:" + host + "\n\ncontent-type;host\n" + sha256hex(payloadStr);
+  const scope = date + "/" + service + "/tc3_request";
+  const sts = "TC3-HMAC-SHA256\n" + ts + "\n" + scope + "\n" + sha256hex(canonicalRequest);
+  const kDate = hmac("TC3" + secretKey, date), kServ = hmac(kDate, service), kSign = hmac(kServ, "tc3_request");
+  const signature = crypto.createHmac("sha256", kSign).update(sts).digest("hex");
+  const auth = "TC3-HMAC-SHA256 Credential=" + secretId + "/" + scope + ", SignedHeaders=content-type;host, Signature=" + signature;
+  const resp = await fetch("https://" + host + "/", {
+    method: "POST",
+    headers: { Authorization: auth, "Content-Type": ct, Host: host, "X-TC-Action": action, "X-TC-Version": version, "X-TC-Timestamp": String(ts) },
+    body: payloadStr,
+  });
+  let j = {}; try { j = await resp.json(); } catch (e) {}
+  const R = j.Response || {};
+  if (R.Result != null) return { ok: true, text: R.Result, requestId: R.RequestId };
+  return { ok: false, error: (R.Error && R.Error.Message) || JSON.stringify(R).slice(0, 200) };
+}
 
 /* 在第一个表格分隔行（|----|）之后插入一行 */
 function insertRowAfterSep(content, rowLine) {
@@ -132,6 +169,14 @@ async function handle(req, res) {
   const APP_KEY = process.env.APP_KEY, GITHUB_TOKEN = process.env.GITHUB_TOKEN;
   if (!APP_KEY || b.key !== APP_KEY) { send(res, 403, { ok: false, error: "forbidden" }); return; }
   const action = String(b.action || "");
+  /* 语音识别：不写文件，直接调腾讯云一句话识别 */
+  if (action === "asr") {
+    try {
+      const asr = await tencentAsr(String(b.data || ""), String(b.format || "wav"), String(b.lang || "zh"));
+      send(res, asr.ok ? 200 : 502, asr);
+    } catch (e) { send(res, 500, { ok: false, error: "asr error" }); }
+    return;
+  }
   const file = FILES[action];
   if (!file) { send(res, 400, { ok: false, error: "bad action" }); return; }
   const H = { Authorization: "token " + GITHUB_TOKEN, "User-Agent": "cet6-site", Accept: "application/vnd.github+json" };
