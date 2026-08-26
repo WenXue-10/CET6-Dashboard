@@ -474,12 +474,6 @@ function submitWrong(){
   if(!s){ toast("请填写错题简述"); return; }
   postBridge({action:"add_wrong",subject:document.getElementById("nw_subject").value,source:document.getElementById("nw_source").value.trim(),summary:s,analysis:document.getElementById("nw_analysis").value.trim()},"错题已提交");
 }
-function submitProgress(){
-  var dim=document.getElementById("np_dim").value;
-  var done=document.getElementById("np_done").value.trim();
-  if(done===""){ toast("请填写已完成数量"); return; }
-  postBridge({action:"set_progress",dim:dim,done:parseInt(done,10)},"进度已更新");
-}
 function quickCheckin(){ postBridge({action:"checkin"},"打卡成功 🐾"); }
 function markWord(i,status){
   var w=WORDS[i]; if(!w) return;
@@ -537,17 +531,7 @@ function openFabMenu(){
   if(FAB_VIEW==="wrong"){ openAddWrong(); return; }
   setModal('<h2>🐱 快捷操作</h2><div class="m-sub">手机上也能随时记</div>'
     + qa("quickCheckin()","🐾","今日打卡","标记今天完成 ☑")
-    + qa("openQuickProgress()","📈","更新进度","五维目标已完成数")
     + qa("openAddWord()","📖","添加生词","手动 / 拍照 / 语音")
     + qa("openAddWrong()","❌","添加错题","手动 / 拍照 / 语音")
-  );
-}
-function openQuickProgress(){
-  var opts=(D.progress||[]).map(function(p){ return '<option value="'+esc(p.dim)+'">'+esc(p.dim)+'（当前 '+p.done+' / '+p.target+'）</option>'; }).join("");
-  if(!opts){ toast("暂无进度配置"); return; }
-  setModal('<h2>📈 更新备考进度</h2><div class="m-sub">填「已完成」总数（如单词背了 1200 个）</div>'
-    + '<div class="f-row"><label>维度</label><div class="f-in"><select id="np_dim">'+opts+'</select></div></div>'
-    + '<div class="f-row"><label>已完成</label><div class="f-in"><input id="np_done" type="number" min="0" placeholder="如：1200"></div></div>'
-    + '<div style="display:flex;gap:8px;margin-top:14px"><button class="btn primary" onclick="submitProgress()">💾 保存</button><button class="btn" onclick="closeModal()">✕ 取消</button></div>'
   );
 }
