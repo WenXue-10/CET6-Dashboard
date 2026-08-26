@@ -342,7 +342,7 @@ def build():
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>喵咪备考 · 六级学习看板</title>
-<meta name="theme-color" content="#ffd0e2">
+<meta name="theme-color" content="#f97316">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/icon-192.png">
 <style>
