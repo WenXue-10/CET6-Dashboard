@@ -37,19 +37,12 @@
           <div class="stat-card p3"><div class="em">📖</div><div class="lab">生词总数</div><div class="num" id="statWords">0</div></div>
           <div class="stat-card p4"><div class="em">✅</div><div class="lab">已掌握生词</div><div class="num" id="statMastered">0</div></div>
           <div class="stat-card p1"><div class="em">❌</div><div class="lab">错题数</div><div class="num" id="statWrong">0</div></div>
-          <div class="stat-card p2"><div class="em">📈</div><div class="lab">平均进度</div><div class="num" id="statAvg">0%</div></div>
         </div>
-        <div class="two-col">
-          <div class="card">
-            <div class="card-head">✅ 今日任务 <small>5 项全完成 = 打卡成功</small></div>
-            <ul class="todo-list" id="taskList"></ul>
-            <div id="checkinWrap" style="display:none;margin-top:10px"><button class="btn primary" onclick="quickCheckin()" style="width:100%">🐾 今日任务完成，打卡！</button></div>
-            <div style="margin-top:10px;font-size:12px;color:var(--muted)" id="taskHint"></div>
-          </div>
-          <div class="card">
-            <div class="card-head">📈 备考进度 <small>五维目标</small></div>
-            <div id="progressList"></div>
-          </div>
+        <div class="card">
+          <div class="card-head">✅ 今日任务 <small>5 项全完成 = 打卡成功</small></div>
+          <ul class="todo-list" id="taskList"></ul>
+          <div id="checkinWrap" style="display:none;margin-top:10px"><button class="btn primary" onclick="quickCheckin()" style="width:100%">🐾 今日任务完成，打卡！</button></div>
+          <div style="margin-top:10px;font-size:12px;color:var(--muted)" id="taskHint"></div>
         </div>
         <div class="card">
           <div class="card-head">🤖 AI 备考助手 <small>由 AI 根据进度生成 · 在豆包中可随时让我更新</small></div>
@@ -108,7 +101,7 @@
       </section>
 
       <section id="view-skills" class="view">
-        <div class="note">🎓 分项训练对应五维目标（听力40 / 阅读80 / 写作30 / 翻译60），点卡片看完整学习指南。</div>
+        <div class="note">🎓 分项训练：听力 / 阅读 / 写作 / 翻译，点卡片看完整学习指南。</div>
         <div id="skillGrid" class="kb-grid"></div>
       </section>
 

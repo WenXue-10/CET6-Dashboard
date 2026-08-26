@@ -19,7 +19,6 @@ function renderHome(){
   document.getElementById("statWords").textContent = st.words||0;
   document.getElementById("statMastered").textContent = st.mastered||0;
   document.getElementById("statWrong").textContent = st.wrong||0;
-  document.getElementById("statAvg").textContent = (st.avg||0)+"%";
   // 今日任务
   var tasks = D.tasks||[];
   var th = tasks.map(function(t){
@@ -36,15 +35,6 @@ function renderHome(){
   var doneN = week.filter(function(w){ return w.done; }).length;
   var wh = week.map(function(w){ return '<span title="周'+esc(w.day)+'" style="display:inline-flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;color:var(--muted)"><b>'+esc(w.day)+'</b><span style="font-size:15px">'+(w.done?'🐾':'☐')+'</span></span>'; }).join("");
   document.getElementById("taskHint").innerHTML = '本周打卡：'+wh+'<div style="margin-top:6px">连续打卡 X 天 🐾 · 本周已打卡 <b>'+doneN+'</b> / 7 天</div>';
-  // 备考进度
-  var prog = D.progress||[];
-  var ph = prog.map(function(p){
-    var pct = Math.min(100, Math.max(0, p.pct||0));
-    return '<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span><b>'+esc(p.dim)+'</b></span><span style="color:var(--muted)">'+esc(p.done)+' / '+esc(p.target)+'</span></div>'
-      + '<div style="height:10px;border-radius:20px;background:var(--pink-soft);overflow:hidden"><div style="width:'+pct+'%;height:100%;border-radius:20px;background:linear-gradient(90deg,#f97316,#fbbf24)"></div></div>'
-      + '<div style="text-align:right;font-size:11px;color:var(--muted);margin-top:2px">'+pct+'%</div></div>';
-  }).join("");
-  document.getElementById("progressList").innerHTML = ph || '<div style="color:var(--muted)">暂无进度数据</div>';
   // AI 助手
   document.getElementById("aiPanel").innerHTML = D.ai || '<p>暂无 AI 建议，在豆包中告诉我你的进度即可生成。</p>';
 }

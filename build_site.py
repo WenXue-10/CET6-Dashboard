@@ -83,24 +83,6 @@ def countdown_days(exam_date):
     except Exception:
         return 0
 
-# ---------- 备考进度 ----------
-_PROGRESS_DIMS = {"单词", "听力", "阅读", "写作", "翻译"}
-def scan_progress():
-    p = find_note("00-备考总览", "备考进度目标.md")
-    if not p:
-        return []
-    rows = parse_table(read(p), header_keys=["维度"])
-    out = []
-    for r in rows:
-        if len(r) < 3 or r[0] not in _PROGRESS_DIMS:
-            continue
-        dim = r[0]
-        target = _to_int(r[1])
-        done = _to_int(r[2]) if len(r) > 2 else 0
-        pct = round(done / target * 100) if target else 0
-        out.append({"dim": dim, "target": target, "done": done, "pct": min(100, max(0, pct))})
-    return out
-
 def _to_int(s):
     m = re.match(r"\s*(\d+(?:\.\d+)?)", str(s).replace(",", ""))
     try:
@@ -299,7 +281,6 @@ def build():
             shutil.copy2(sp, os.path.join(OUT, fname))
 
     cfg = load_config()
-    progress = scan_progress()
     tasks, week = scan_tasks_week()
     words = scan_words()
     wrong = scan_wrong()
@@ -311,10 +292,9 @@ def build():
     days = countdown_days(cfg["exam_date"])
     mastered = sum(1 for w in words if w["status"] == "已掌握")
     checkin = sum(1 for w in week if w["done"])
-    avg = round(sum(p["pct"] for p in progress) / len(progress)) if progress else 0
 
     stats = {"days": days, "checkin": checkin, "words": len(words), "mastered": mastered,
-             "wrong": len(wrong), "avg": avg}
+             "wrong": len(wrong)}
 
     data = {
         "updated": latest_mtime().strftime("%Y-%m-%d %H:%M"),
@@ -322,7 +302,6 @@ def build():
         "stats": stats,
         "tasks": tasks,
         "week": week,
-        "progress": progress,
         "words": words,
         "wrong": wrong,
         "skills": skills,
