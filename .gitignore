@@ -1,0 +1,10 @@
+# Obsidian 工作区状态（个人隐私，不入库）
+.obsidian/workspace*.json
+.obsidian/cache
+.obsidian/plugins/obsidian-git/data.json
+.trash/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+.tmp_scan/

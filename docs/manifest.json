@@ -1,0 +1,15 @@
+{
+  "name": "喵咪备考 · 六级学习看板",
+  "short_name": "六级看板",
+  "description": "文雪的六级备考作战看板：倒计时、每日任务、词汇、错题本、分项训练、资料与知识库，全自动同步",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fff7fa",
+  "theme_color": "#ffd0e2",
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

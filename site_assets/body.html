@@ -1,0 +1,145 @@
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="icon">🐱</div>
+      <div><div class="name">喵咪备考</div><div class="sub">🎓 六级陪伴打卡 · 供应链学霸</div></div>
+    </div>
+    <div class="nav-item active" data-go="home">🎯 备考看板</div>
+    <div class="nav-item" data-go="vocab">📖 词汇</div>
+    <div class="nav-item" data-go="wrong">❌ 错题本</div>
+    <div class="nav-item" data-go="skills">🎓 分项训练</div>
+    <div class="nav-item" data-go="materials">📎 学习资料</div>
+    <div class="nav-item" data-go="knowledge">📚 知识库</div>
+    <div class="foot">🐾 全站公开 · 由 AI 自动同步<br>数据实时生成自 Obsidian 知识库<br>🤖 在豆包中更新笔记即可刷新本页</div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <h1 id="pageTitle">🎯 备考看板</h1>
+      <div class="top-right">
+        <div class="sync"><span class="dot"></span><span id="syncText">自动同步</span></div>
+        <div class="gsearch" onclick="openGlobalSearch()" title="全局搜索">🔍</div>
+        <div class="avatar" onclick="openPersonalize()" title="换头像 / 换背景"><img id="avatarImg" src="" alt="头像"></div>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <section id="view-home" class="view active">
+        <div class="card" style="background:linear-gradient(135deg,rgba(255,240,246,.72),rgba(243,236,255,.72));border:none;padding:16px 20px">
+          <div style="font-size:15px;font-weight:800">🐱 喵～今天也一起加油备考六级吧！</div>
+          <div style="font-size:12.5px;color:var(--muted);margin-top:4px">每日 5 项任务 · 打卡陪伴 · AI 动态调整计划 · 距考试倒计时中 🐾</div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card p1"><div class="em">📅</div><div class="lab">距考试（天）</div><div class="num" id="statDays">0</div></div>
+          <div class="stat-card p2"><div class="em">🐾</div><div class="lab">本周打卡</div><div class="num" id="statCheck">0</div></div>
+          <div class="stat-card p3"><div class="em">📖</div><div class="lab">生词总数</div><div class="num" id="statWords">0</div></div>
+          <div class="stat-card p4"><div class="em">✅</div><div class="lab">已掌握生词</div><div class="num" id="statMastered">0</div></div>
+          <div class="stat-card p1"><div class="em">❌</div><div class="lab">错题数</div><div class="num" id="statWrong">0</div></div>
+          <div class="stat-card p2"><div class="em">📈</div><div class="lab">平均进度</div><div class="num" id="statAvg">0%</div></div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-head">✅ 今日任务 <small>5 项全完成 = 打卡成功</small></div>
+            <ul class="todo-list" id="taskList"></ul>
+            <div style="margin-top:10px;font-size:12px;color:var(--muted)" id="taskHint"></div>
+          </div>
+          <div class="card">
+            <div class="card-head">📈 备考进度 <small>五维目标</small></div>
+            <div id="progressList"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">🤖 AI 备考助手 <small>由 AI 根据进度生成 · 在豆包中可随时让我更新</small></div>
+          <div id="aiPanel" class="note-body" style="font-size:13.5px"></div>
+        </div>
+        <div class="card">
+          <div class="card-head">🐱 快捷入口</div>
+          <div class="quick-grid">
+            <a data-go="vocab">📖 词汇</a>
+            <a data-go="wrong">❌ 错题本</a>
+            <a data-go="skills">🎓 分项训练</a>
+            <a data-go="materials">📎 资料</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-vocab" class="view">
+        <div class="note">📖 生词来自 [[生词表]]，在工作台「生词本」录入或在此表填写后同步即可。支持按「学习中 / 已掌握」筛选。</div>
+        <div class="stat-grid">
+          <div class="stat-card p3"><div class="em">📖</div><div class="lab">生词总数</div><div class="num" id="vTotal">0</div></div>
+          <div class="stat-card p1"><div class="em">🔥</div><div class="lab">学习中</div><div class="num" id="vLearning">0</div></div>
+          <div class="stat-card p2"><div class="em">✅</div><div class="lab">已掌握</div><div class="num" id="vMastered">0</div></div>
+        </div>
+        <div class="filterbar">
+          <div class="search"><span>🔍</span><input id="vsearch" placeholder="搜索单词 / 释义…"></div>
+          <div class="chips" id="vchips">
+            <span class="chip active" data-f="all">全部</span>
+            <span class="chip" data-f="learning">🔥 学习中</span>
+            <span class="chip" data-f="mastered">✅ 已掌握</span>
+          </div>
+        </div>
+        <div id="wordList" class="job-list"></div>
+      </section>
+
+      <section id="view-wrong" class="view">
+        <div class="note">❌ 错题来自 [[错题记录模板]]，按科目（听力/阅读/词汇/写作/翻译）分类，定期回顾防重犯。</div>
+        <div class="stat-grid">
+          <div class="stat-card p4"><div class="em">❌</div><div class="lab">错题总数</div><div class="num" id="wTotal">0</div></div>
+          <div class="stat-card p2"><div class="em">👂</div><div class="lab">听力</div><div class="num" id="wSub0">0</div></div>
+          <div class="stat-card p3"><div class="em">📖</div><div class="lab">阅读</div><div class="num" id="wSub1">0</div></div>
+          <div class="stat-card p1"><div class="em">🔤</div><div class="lab">词汇</div><div class="num" id="wSub2">0</div></div>
+          <div class="stat-card p3"><div class="em">✍️</div><div class="lab">写作</div><div class="num" id="wSub3">0</div></div>
+          <div class="stat-card p2"><div class="em">🀄</div><div class="lab">翻译</div><div class="num" id="wSub4">0</div></div>
+        </div>
+        <div class="filterbar">
+          <div class="chips" id="wchips">
+            <span class="chip active" data-f="all">全部</span>
+            <span class="chip" data-f="听力">👂 听力</span>
+            <span class="chip" data-f="阅读">📖 阅读</span>
+            <span class="chip" data-f="词汇">🔤 词汇</span>
+            <span class="chip" data-f="写作">✍️ 写作</span>
+            <span class="chip" data-f="翻译">🀄 翻译</span>
+          </div>
+        </div>
+        <div id="wrongList" class="job-list"></div>
+      </section>
+
+      <section id="view-skills" class="view">
+        <div class="note">🎓 分项训练对应五维目标（听力40 / 阅读80 / 写作30 / 翻译60），点卡片看完整学习指南。</div>
+        <div id="skillGrid" class="kb-grid"></div>
+      </section>
+
+      <section id="view-materials" class="view">
+        <div class="note">📎 精选备考资料来自工作台「学习资料」模块，按词汇 / 写作 / 翻译 / 真题 / 听力分类整理。</div>
+        <div id="matList"></div>
+      </section>
+
+      <section id="view-knowledge" class="view">
+        <div class="note">🐾 全部文件夹都可以点开看内容，笔记全文自动从 Obsidian 知识库同步。</div>
+        <div class="kb-grid" id="kbGrid"></div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <span class="m-close" onclick="closeModal()">✕</span>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <div class="bn-item active" data-go="home"><span class="ic">🎯</span>看板</div>
+  <div class="bn-item" data-go="vocab"><span class="ic">📖</span>词汇</div>
+  <div class="bn-item" data-go="wrong"><span class="ic">❌</span>错题</div>
+  <div class="bn-item" data-go="skills"><span class="ic">🎓</span>训练</div>
+  <div class="bn-item" data-go="materials"><span class="ic">📎</span>资料</div>
+  <div class="bn-item" data-go="knowledge"><span class="ic">📚</span>知识库</div>
+</nav>
+
+<div id="floats"></div>
+<div class="toast" id="toast"></div>

@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>喵咪备考 · 六级学习看板</title>
+<meta name="theme-color" content="#ffd0e2">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<style>
+
+:root{
+  --bg:#fff6f9; --card:rgba(255,255,255,.84); --line:#ffdcea;
+  --text:#6b4a5e; --muted:#b48ea3;
+  --pink:#ff7fb0; --pink-deep:#e0558a; --pink-soft:#ffe3ee;
+  --lav:#a78bfa; --lav-soft:#efe8ff;
+  --mint:#34c98e; --mint-soft:#d9f7e9;
+  --peach:#ff9e6d; --peach-soft:#ffe9dc;
+  --sky:#4aa8f0; --sky-soft:#e0f2ff;
+  --sun:#f2b705; --sun-soft:#fff4d6;
+  --gray-soft:#f6eef3;
+  --shadow:0 8px 24px rgba(224,122,166,.14);
+  --shadow-sm:0 4px 14px rgba(224,122,166,.10);
+  --bg-img:none; /* 🖼️ 背景图片：把图片放进网站文件夹后，把 none 改成 url("你的图片名.png") 即可 */
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",sans-serif;background:linear-gradient(180deg,rgba(255,247,250,.66),rgba(255,247,250,.78)),var(--bg-img,linear-gradient(180deg,#fff7fa 0%,#f6f0ff 100%));background-size:cover;background-position:center;background-attachment:fixed;color:var(--text);line-height:1.55;min-height:100vh}
+a{color:var(--pink-deep);text-decoration:none}
+.app{display:flex;min-height:100vh}
+/* ===== 桌面侧边栏（白卡片 + 粉粉的） ===== */
+.sidebar{width:236px;flex-shrink:0;margin:16px 0 16px 16px;background:var(--card);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);padding:22px 16px;position:sticky;top:16px;height:calc(100vh - 32px);display:flex;flex-direction:column;gap:4px}
+.sidebar .logo{display:flex;align-items:center;gap:11px;padding:4px 8px 20px;color:var(--text)}
+.logo .icon{width:46px;height:46px;border-radius:16px;background:linear-gradient(135deg,#ff9ec7,#c9a8ff);display:flex;align-items:center;justify-content:center;font-size:23px;box-shadow:0 6px 16px rgba(255,126,180,.35)}
+.logo .name{font-weight:800;font-size:16px;letter-spacing:.5px}
+.logo .sub{font-size:11px;color:var(--muted)}
+.nav-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:18px;cursor:pointer;font-size:14px;color:var(--muted);transition:.15s;user-select:none;font-weight:600}
+.nav-item:hover{background:var(--pink-soft);color:var(--pink-deep)}
+.nav-item.active{background:linear-gradient(135deg,#ff8fb8,#c9a8ff);color:#fff;box-shadow:0 6px 16px rgba(255,126,180,.35)}
+.sidebar .foot{margin-top:auto;font-size:11px;color:var(--muted);padding:12px 8px;line-height:1.7}
+/* ===== 主区 ===== */
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(255,247,250,.74);backdrop-filter:blur(10px);padding:16px 26px;display:flex;align-items:center;gap:12px}
+.topbar h1{font-size:19px;font-weight:800;color:var(--text)}
+.sync{margin-left:auto;display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);background:rgba(255,255,255,.84);border:1px solid var(--line);padding:6px 14px;border-radius:30px;white-space:nowrap;box-shadow:var(--shadow-sm)}
+.sync .dot{width:8px;height:8px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 3px rgba(52,201,142,.18)}
+.content{padding:22px 26px 40px;max-width:1080px;width:100%;margin:0 auto}
+.view{display:none}
+.view.active{display:block;animation:fade .3s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+/* ===== 统计卡片（马卡龙渐变） ===== */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat-card{border-radius:24px;padding:16px 18px;box-shadow:var(--shadow-sm);border:1px solid rgba(255,255,255,.6)}
+.stat-card.p1{background:linear-gradient(135deg,rgba(255,227,238,.72),rgba(255,208,226,.72))}
+.stat-card.p2{background:linear-gradient(135deg,rgba(239,232,255,.72),rgba(226,214,255,.72))}
+.stat-card.p3{background:linear-gradient(135deg,rgba(217,247,233,.72),rgba(195,240,221,.72))}
+.stat-card.p4{background:linear-gradient(135deg,rgba(255,233,220,.72),rgba(255,220,200,.72))}
+.stat-card .em{font-size:17px}
+.stat-card .lab{font-size:12.5px;font-weight:600;color:var(--muted);margin-top:2px}
+.stat-card .num{font-size:27px;font-weight:800;margin-top:2px}
+/* ===== 卡片 ===== */
+.card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:18px 20px;box-shadow:var(--shadow-sm);margin-bottom:16px}
+.card-head{font-size:15px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card-head small{font-weight:400;color:var(--muted);font-size:12px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.todo-list{list-style:none}
+.todo-list li{display:flex;gap:10px;padding:9px 2px;border-bottom:1px dashed #ffdcea;font-size:14px;align-items:flex-start}
+.todo-list li:last-child{border-bottom:none}
+.todo-list input{margin-top:3px;accent-color:var(--pink)}
+.mini-tl .tl-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px dashed #ffdcea;font-size:13.5px;color:var(--muted)}
+.mini-tl .tl-item:last-child{border-bottom:none}
+.tl-date{flex-shrink:0;background:var(--pink-soft);color:var(--pink-deep);font-size:12px;font-weight:700;padding:2px 9px;border-radius:20px;height:fit-content}
+.text-link{font-size:13px;color:var(--pink-deep);font-weight:600}
+.quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.quick-grid a{display:flex;flex-direction:column;align-items:center;gap:7px;border-radius:20px;padding:16px 8px;font-size:13px;font-weight:700;cursor:pointer;background:rgba(255,227,238,.8);color:var(--pink-deep);border:1px solid #ffd0e2;transition:.15s}
+.quick-grid a:hover{transform:translateY(-2px)}
+/* ===== 筛选 ===== */
+.filterbar{display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
+.search{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.84);border:1px solid var(--line);border-radius:30px;padding:11px 16px;box-shadow:var(--shadow-sm)}
+.search input{border:none;outline:none;flex:1;font-size:14px;background:transparent;color:var(--text)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{font-size:13px;padding:7px 15px;border-radius:30px;background:rgba(255,255,255,.84);border:1px solid var(--line);color:var(--muted);cursor:pointer;user-select:none;font-weight:600}
+.chip.active{background:linear-gradient(135deg,#ff8fb8,#c9a8ff);border-color:transparent;color:#fff}
+/* ===== 岗位卡片 ===== */
+.job-list{display:flex;flex-direction:column;gap:12px}
+.job-card{background:rgba(255,255,255,.84);border:1px solid var(--line);border-radius:22px;padding:16px 18px;cursor:pointer;box-shadow:var(--shadow-sm);transition:.15s}
+.job-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:#ffc4da}
+.job-top{display:flex;align-items:flex-start;gap:10px}
+.job-title{flex:1;min-width:0}
+.job-title .company{font-weight:800;font-size:16px;display:block;color:var(--text)}
+.job-title .pos{font-size:13.5px;color:var(--muted);display:block;margin-top:2px}
+.badge{flex-shrink:0;font-size:15px;font-weight:800;min-width:46px;text-align:center;padding:6px 10px;border-radius:14px}
+.badge.green{background:var(--mint-soft);color:#1f9d6b}
+.badge.blue{background:var(--sky-soft);color:#1d7fd6}
+.badge.amber{background:var(--sun-soft);color:#c98a04}
+.badge.red{background:var(--peach-soft);color:#e2654a}
+.badge.gray{background:var(--gray-soft);color:var(--muted)}
+.job-meta{font-size:13px;color:var(--muted);margin:8px 0 10px}
+.job-tags{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.status{font-size:12px;padding:3px 11px;border-radius:20px;font-weight:700}
+.status.done{background:var(--mint-soft);color:#1f9d6b}
+.status.warn{background:var(--sun-soft);color:#c98a04}
+.status.backup{background:var(--gray-soft);color:var(--muted)}
+.status.new{background:var(--sky-soft);color:#1d7fd6}
+.status.interview{background:var(--peach-soft);color:#e2654a}
+.status.dead{background:var(--pink-soft);color:var(--pink-deep)}
+.level{font-size:12px;color:var(--muted);background:var(--gray-soft);padding:3px 11px;border-radius:20px}
+.link-btn{margin-left:auto;font-size:12.5px;color:var(--pink-deep);background:var(--pink-soft);padding:5px 13px;border-radius:20px;cursor:pointer;font-weight:600}
+/* ===== 公司池 ===== */
+.cmp-sec{margin-bottom:18px}
+.cmp-sec h3{font-size:15px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.cmp-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cmp-card{background:rgba(255,255,255,.84);border:1px solid var(--line);border-radius:20px;padding:14px 16px;box-shadow:var(--shadow-sm);cursor:pointer;transition:.15s}
+.cmp-card:hover{transform:translateY(-2px);border-color:#ffc4da}
+.cmp-card .cn{font-weight:800;font-size:14.5px}
+.cmp-card .why{font-size:12.5px;color:var(--muted);margin-top:5px;line-height:1.6}
+.cmp-card .more{font-size:12px;color:var(--pink-deep);margin-top:6px;font-weight:600}
+.removed{background:rgba(255,233,220,.75);border-color:#ffd0bd}
+.removed .cn{color:#d9583f}
+/* ===== 日报时间线 ===== */
+.timeline{position:relative;padding-left:26px}
+.timeline::before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:linear-gradient(180deg,#ffb3d1,#c9b8ff)}
+.tl-card{position:relative;background:rgba(255,255,255,.84);border:1px solid var(--line);border-radius:20px;padding:14px 16px;margin-bottom:16px;box-shadow:var(--shadow-sm)}
+.tl-card::before{content:"";position:absolute;left:-23px;top:18px;width:11px;height:11px;border-radius:50%;background:linear-gradient(135deg,#ff8fb8,#c9a8ff);border:2px solid #fff;box-shadow:0 0 0 3px #ffd0e2}
+.tl-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.tl-title{font-weight:800;font-size:14px}
+.tl-badge{font-size:11.5px;padding:2px 10px;border-radius:20px;background:var(--pink-soft);color:var(--pink-deep);font-weight:700}
+.tl-body{font-size:13.5px;color:var(--muted)}
+.tl-body li{margin:4px 0 4px 18px}
+/* ===== 知识库 ===== */
+.note{font-size:12.5px;color:var(--muted);background:rgba(255,255,255,.84);border:1px solid var(--line);border-radius:16px;padding:11px 15px;margin-bottom:16px;box-shadow:var(--shadow-sm)}
+.kb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.kb-card{border-radius:22px;padding:16px;cursor:pointer;transition:.15s;border:1px solid rgba(255,255,255,.7);box-shadow:var(--shadow-sm)}
+.kb-card:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.kb-card.c1{background:linear-gradient(135deg,rgba(255,227,238,.72),rgba(255,208,226,.72))}
+.kb-card.c2{background:linear-gradient(135deg,rgba(239,232,255,.72),rgba(226,214,255,.72))}
+.kb-card.c3{background:linear-gradient(135deg,rgba(217,247,233,.72),rgba(195,240,221,.72))}
+.kb-card.c4{background:linear-gradient(135deg,rgba(255,233,220,.72),rgba(255,220,200,.72))}
+.kb-card.c5{background:linear-gradient(135deg,rgba(224,242,255,.72),rgba(207,233,255,.72))}
+.kb-card .ic{font-size:21px}
+.kb-card .kn{font-weight:800;font-size:14px;margin-top:6px}
+.kb-card .kd{font-size:12.5px;color:var(--muted);margin-top:3px}
+.kb-card .ncount{display:inline-block;margin-top:9px;font-size:11.5px;background:rgba(255,255,255,.75);color:var(--pink-deep);padding:3px 10px;border-radius:20px;font-weight:700}
+/* 简历分组 */
+.resume-group{margin-bottom:20px}
+.group-head{font-size:14.5px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.group-head small{font-weight:400;color:var(--muted);font-size:12px}
+.company-group{border:2px dashed var(--line);border-radius:20px;padding:14px;background:rgba(255,255,255,.5);margin-bottom:10px}
+.cg-name{font-size:13.5px;font-weight:800;margin-bottom:10px;color:var(--pink-deep);display:flex;align-items:center;gap:6px}
+.empty-tip{font-size:12.5px;color:var(--muted);background:rgba(255,255,255,.6);border:1px dashed var(--line);border-radius:16px;padding:12px 14px;text-align:center}
+/* ===== 简历库 ===== */
+.resume-list{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.resume-card{background:rgba(255,255,255,.84);border:1px solid var(--line);border-radius:22px;padding:16px 18px;cursor:pointer;box-shadow:var(--shadow-sm);transition:.15s;display:flex;gap:14px;align-items:center}
+.resume-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:#ffc4da}
+.resume-ic{width:46px;height:46px;border-radius:16px;background:linear-gradient(135deg,#ff9ec7,#c9a8ff);display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0}
+.resume-card .rn{font-weight:800;font-size:14.5px}
+.resume-card .rd{font-size:12.5px;color:var(--muted);margin-top:2px}
+.resume-card .act{margin-left:auto;display:flex;flex-direction:column;gap:6px}
+.pill{font-size:12px;font-weight:700;padding:6px 12px;border-radius:20px;text-align:center;cursor:pointer;white-space:nowrap}
+.pill.g{background:linear-gradient(135deg,#ff8fb8,#c9a8ff);color:#fff}
+.pill.o{background:var(--pink-soft);color:var(--pink-deep)}
+/* ===== 头像 & 个性化 ===== */
+.top-right{display:flex;align-items:center;gap:10px;margin-left:auto}
+.top-right .sync{margin-left:0}
+.avatar{width:38px;height:38px;border-radius:50%;padding:2px;background:linear-gradient(135deg,#ff8fb8,#c9a8ff);cursor:pointer;flex-shrink:0;box-shadow:0 4px 12px rgba(224,122,166,.3);transition:.15s}
+.avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover;border:2px solid #fff;display:block}
+.avatar:hover{transform:scale(1.08)}
+.pick-sec{margin-bottom:16px}
+.pick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.pick-item{border-radius:16px;overflow:hidden;cursor:pointer;border:3px solid transparent;background:rgba(255,255,255,.84);box-shadow:var(--shadow-sm);transition:.15s}
+.pick-item:hover{transform:translateY(-3px)}
+.pick-item.active{border-color:var(--pink);box-shadow:0 0 0 3px rgba(255,127,176,.25)}
+.pick-item img{width:100%;height:80px;object-fit:cover;display:block}
+.pick-item .pn{font-size:11px;text-align:center;padding:5px 2px;color:var(--muted);font-weight:600}
+.pick-item.av img{border-radius:50%;width:66px;height:66px;margin:10px auto 0}
+.pick-item.av .pn{padding:6px 2px 9px}
+.pick-hint{font-size:11.5px;color:var(--muted);margin:-6px 0 10px}
+@media(max-width:820px){
+  .avatar{width:34px;height:34px}
+  .pick-grid{grid-template-columns:repeat(2,1fr)}
+}
+/* ===== 弹窗 ===== */
+.modal-backdrop{position:fixed;inset:0;background:rgba(107,74,94,.45);backdrop-filter:blur(4px);display:none;align-items:flex-end;justify-content:center;z-index:50}
+.modal-backdrop.show{display:flex}
+.modal{background:rgba(255,255,255,.97);width:100%;max-width:640px;max-height:88vh;overflow-y:auto;border-radius:28px 28px 0 0;padding:24px 22px 30px;animation:up .28s ease}
+@keyframes up{from{transform:translateY(46px);opacity:0}to{transform:none;opacity:1}}
+.modal h2{font-size:19px;margin-bottom:4px}
+.modal .m-sub{font-size:13px;color:var(--muted);margin-bottom:14px}
+.m-close{float:right;font-size:20px;color:var(--muted);cursor:pointer;line-height:1;background:var(--gray-soft);width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.m-sec{font-size:14px;font-weight:800;margin:16px 0 8px;display:flex;align-items:center;gap:8px}
+.m-table{width:100%;border-collapse:collapse;font-size:13.5px}
+.m-table td{padding:8px 10px;border-bottom:1px solid #ffdcea}
+.m-table td:last-child{text-align:right;font-weight:700}
+.m-links{display:flex;gap:8px;flex-wrap:wrap}
+.m-links a{font-size:12.5px;background:var(--pink-soft);color:var(--pink-deep);padding:8px 15px;border-radius:20px;cursor:pointer;border:1px solid #ffd0e2;font-weight:700}
+.note-item{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:16px;background:var(--gray-soft);margin-bottom:8px;cursor:pointer;transition:.15s;font-size:13.5px;font-weight:600}
+.note-item:hover{background:var(--pink-soft)}
+.note-item .ni-ic{font-size:17px}
+.note-item .ni-more{margin-left:auto;color:var(--pink-deep);font-size:12px}
+.pdf-ph{background:linear-gradient(135deg,#ffe3ee,#efe8ff);border:2px dashed #ffb3d1;border-radius:18px;height:190px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);font-size:13px;gap:8px;margin-bottom:14px}
+/* ===== 底部导航（手机） ===== */
+.bottom-nav{display:none;position:fixed;left:12px;right:12px;bottom:12px;background:rgba(255,255,255,.9);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:26px;box-shadow:var(--shadow);z-index:40}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 0;font-size:10px;color:var(--muted);cursor:pointer;user-select:none;font-weight:600}
+.bn-item .ic{font-size:18px}
+.bn-item.active{color:var(--pink-deep)}
+.bn-item.active .ic{transform:scale(1.12)}
+/* toast */
+.toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%) translateY(20px);background:var(--text);color:#fff;font-size:13px;padding:10px 18px;border-radius:30px;opacity:0;transition:.25s;z-index:60;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* ===== 小动画 ===== */
+@keyframes pop{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:none}}
+.stat-card,.job-card,.cmp-card,.kb-card,.resume-card,.tl-card,.quick-grid a{animation:pop .5s cubic-bezier(.34,1.56,.64,1) both}
+.stat-card:nth-child(2){animation-delay:.06s}
+.stat-card:nth-child(3){animation-delay:.12s}
+.stat-card:nth-child(4){animation-delay:.18s}
+.cmp-card:nth-child(2){animation-delay:.05s}
+.cmp-card:nth-child(3){animation-delay:.10s}
+.cmp-card:nth-child(4){animation-delay:.15s}
+.kb-card:nth-child(2){animation-delay:.04s}
+.kb-card:nth-child(3){animation-delay:.08s}
+.kb-card:nth-child(4){animation-delay:.12s}
+.kb-card:nth-child(5){animation-delay:.16s}
+.kb-card:nth-child(6){animation-delay:.20s}
+.kb-card:nth-child(7){animation-delay:.24s}
+.kb-card:nth-child(8){animation-delay:.28s}
+.kb-card:nth-child(9){animation-delay:.32s}
+.resume-card:nth-child(2){animation-delay:.06s}
+.resume-card:nth-child(3){animation-delay:.12s}
+.resume-card:nth-child(4){animation-delay:.18s}
+.resume-card:nth-child(5){animation-delay:.24s}
+.job-card:nth-child(2){animation-delay:.04s}
+.job-card:nth-child(3){animation-delay:.08s}
+.job-card:nth-child(4){animation-delay:.12s}
+.job-card:nth-child(5){animation-delay:.16s}
+.job-card:nth-child(6){animation-delay:.20s}
+/* logo 图标轻轻跳动 */
+.logo .icon{animation:floaty 2.6s ease-in-out infinite}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+/* 同步小绿点呼吸 */
+.sync .dot{animation:pulse 2s ease-out infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(52,201,142,.4)}70%{box-shadow:0 0 0 9px rgba(52,201,142,0)}100%{box-shadow:0 0 0 0 rgba(52,201,142,0)}}
+/* 悬停小抖动 */
+.nav-item:hover .ic,.job-card:hover .badge,.kb-card:hover .ic{animation:wiggle .45s ease}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-14deg)}75%{transform:rotate(14deg)}}
+/* 底部导航选中图标弹一下 */
+.bn-item.active .ic{animation:bnpop .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes bnpop{0%{transform:scale(1)}40%{transform:scale(1.35) rotate(-8deg)}100%{transform:scale(1.12)}}
+/* 漂浮的小爱心/星星 */
+#floats{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:5;overflow:hidden}
+#floats span{position:absolute;bottom:-46px;animation:floatUp linear infinite;opacity:0}
+@keyframes floatUp{0%{transform:translateY(0) rotate(0);opacity:0}12%{opacity:.85}100%{transform:translateY(-112vh) rotate(24deg);opacity:0}}
+/* 弹窗内容弹入 */
+.modal .m-sec{animation:pop .4s ease both}
+@media (prefers-reduced-motion: reduce){
+  .stat-card,.job-card,.cmp-card,.kb-card,.resume-card,.tl-card,.quick-grid a{animation:none}
+  .logo .icon,.sync .dot,#floats span{animation:none}
+}
+/* ===== 响应式 ===== */
+@media(max-width:820px){
+  .sidebar{display:none}
+  .bottom-nav{display:flex}
+  .content{padding:14px 14px 100px}
+  .topbar{padding:12px 14px}
+  .topbar h1{font-size:16px}
+  .sync{font-size:11px;padding:5px 10px}
+  .stat-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .two-col{grid-template-columns:1fr}
+  .quick-grid{grid-template-columns:repeat(2,1fr)}
+  .cmp-grid{grid-template-columns:1fr}
+  .kb-grid{grid-template-columns:1fr 1fr}
+  .resume-list{grid-template-columns:1fr}
+  .job-card{padding:14px}
+  .resume-card .act{flex-direction:row}
+}
+@media(min-width:821px){
+  .modal{border-radius:28px;margin-bottom:8vh}
+}
+
+/* ===== 正式版 v2 补充 ===== */
+/* 筛选胶囊：手机可横向滑动 */
+.chips{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0}
+/* 完整状态颜色 */
+.status.ready{background:var(--sky-soft,#e0f2ff);color:#1d7fd6}
+.status.sent{background:var(--sky-soft);color:#0369a1}
+.status.offer{background:var(--mint-soft);color:#1f9d6b}
+.status.dead{background:var(--red-soft);color:#e2654a}
+/* 简历卡：名字在上、按钮在下一行，不再挤压名字 */
+.resume-card{flex-direction:column;align-items:stretch;gap:10px}
+.resume-top{display:flex;align-items:center;gap:12px}
+.resume-top .rn{font-weight:800;font-size:14.5px}
+.resume-top .rd{font-size:12.5px;color:var(--muted);margin-top:2px}
+.resume-actions{display:flex;gap:8px;flex-wrap:wrap}
+.resume-actions .pill{flex:1;min-width:104px;text-align:center;display:inline-block}
+.resume-actions a.pill{text-decoration:none}
+/* 知识库弹窗分组 */
+.kb-section{font-size:13.5px;font-weight:800;margin:16px 0 8px;color:var(--pink-deep);display:flex;align-items:center;gap:6px}
+.kb-folder{background:var(--gray-soft);border-radius:16px;padding:10px 12px;margin:8px 0}
+.kb-folder .kf-name{font-size:13px;font-weight:800;margin-bottom:6px}
+.kb-folder .note-item{margin-bottom:6px}
+.kb-folder .kb-folder{margin-left:14px;background:var(--gray-soft);box-shadow:inset 3px 0 0 var(--pink-soft)}
+.note-body{font-size:13.5px;line-height:1.7;color:var(--text)}
+.note-body h1,.note-body h2,.note-body h3{margin:14px 0 6px;color:var(--text)}
+.note-body table{width:100%;border-collapse:collapse;font-size:12px;margin:8px 0}
+.note-body th,.note-body td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+.note-body th{background:var(--pink-soft)}
+.note-body img{max-width:100%;border-radius:12px}
+.note-body blockquote{border-left:3px solid var(--pink);background:var(--pink-soft);padding:8px 12px;border-radius:8px;margin:8px 0;color:var(--muted)}
+.note-body ul,.note-body ol{padding-left:20px;margin:6px 0}
+.note-body li{margin:3px 0}
+.note-body code{background:var(--gray-soft);padding:1px 6px;border-radius:6px;font-size:12px}
+.note-body pre{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;overflow-x:auto;font-size:12px}
+@media(max-width:820px){
+  .resume-actions .pill{min-width:0}
+  .resume-actions .pill{flex:1 1 46%}
+}
+/* 顶栏全局搜索按钮 */
+.gsearch{width:38px;height:38px;border-radius:50%;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;box-shadow:var(--shadow-sm);flex-shrink:0;transition:.15s}
+.gsearch:hover{transform:scale(1.08)}
+@media(max-width:820px){ .gsearch{width:34px;height:34px;font-size:15px} }
+
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="icon">🐱</div>
+      <div><div class="name">喵咪备考</div><div class="sub">🎓 六级陪伴打卡 · 供应链学霸</div></div>
+    </div>
+    <div class="nav-item active" data-go="home">🎯 备考看板</div>
+    <div class="nav-item" data-go="vocab">📖 词汇</div>
+    <div class="nav-item" data-go="wrong">❌ 错题本</div>
+    <div class="nav-item" data-go="skills">🎓 分项训练</div>
+    <div class="nav-item" data-go="materials">📎 学习资料</div>
+    <div class="nav-item" data-go="knowledge">📚 知识库</div>
+    <div class="foot">🐾 全站公开 · 由 AI 自动同步<br>数据实时生成自 Obsidian 知识库<br>🤖 在豆包中更新笔记即可刷新本页</div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <h1 id="pageTitle">🎯 备考看板</h1>
+      <div class="top-right">
+        <div class="sync"><span class="dot"></span><span id="syncText">自动同步</span></div>
+        <div class="gsearch" onclick="openGlobalSearch()" title="全局搜索">🔍</div>
+        <div class="avatar" onclick="openPersonalize()" title="换头像 / 换背景"><img id="avatarImg" src="" alt="头像"></div>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <section id="view-home" class="view active">
+        <div class="card" style="background:linear-gradient(135deg,rgba(255,240,246,.72),rgba(243,236,255,.72));border:none;padding:16px 20px">
+          <div style="font-size:15px;font-weight:800">🐱 喵～今天也一起加油备考六级吧！</div>
+          <div style="font-size:12.5px;color:var(--muted);margin-top:4px">每日 5 项任务 · 打卡陪伴 · AI 动态调整计划 · 距考试倒计时中 🐾</div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card p1"><div class="em">📅</div><div class="lab">距考试（天）</div><div class="num" id="statDays">0</div></div>
+          <div class="stat-card p2"><div class="em">🐾</div><div class="lab">本周打卡</div><div class="num" id="statCheck">0</div></div>
+          <div class="stat-card p3"><div class="em">📖</div><div class="lab">生词总数</div><div class="num" id="statWords">0</div></div>
+          <div class="stat-card p4"><div class="em">✅</div><div class="lab">已掌握生词</div><div class="num" id="statMastered">0</div></div>
+          <div class="stat-card p1"><div class="em">❌</div><div class="lab">错题数</div><div class="num" id="statWrong">0</div></div>
+          <div class="stat-card p2"><div class="em">📈</div><div class="lab">平均进度</div><div class="num" id="statAvg">0%</div></div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-head">✅ 今日任务 <small>5 项全完成 = 打卡成功</small></div>
+            <ul class="todo-list" id="taskList"></ul>
+            <div style="margin-top:10px;font-size:12px;color:var(--muted)" id="taskHint"></div>
+          </div>
+          <div class="card">
+            <div class="card-head">📈 备考进度 <small>五维目标</small></div>
+            <div id="progressList"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">🤖 AI 备考助手 <small>由 AI 根据进度生成 · 在豆包中可随时让我更新</small></div>
+          <div id="aiPanel" class="note-body" style="font-size:13.5px"></div>
+        </div>
+        <div class="card">
+          <div class="card-head">🐱 快捷入口</div>
+          <div class="quick-grid">
+            <a data-go="vocab">📖 词汇</a>
+            <a data-go="wrong">❌ 错题本</a>
+            <a data-go="skills">🎓 分项训练</a>
+            <a data-go="materials">📎 资料</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-vocab" class="view">
+        <div class="note">📖 生词来自 [[生词表]]，在工作台「生词本」录入或在此表填写后同步即可。支持按「学习中 / 已掌握」筛选。</div>
+        <div class="stat-grid">
+          <div class="stat-card p3"><div class="em">📖</div><div class="lab">生词总数</div><div class="num" id="vTotal">0</div></div>
+          <div class="stat-card p1"><div class="em">🔥</div><div class="lab">学习中</div><div class="num" id="vLearning">0</div></div>
+          <div class="stat-card p2"><div class="em">✅</div><div class="lab">已掌握</div><div class="num" id="vMastered">0</div></div>
+        </div>
+        <div class="filterbar">
+          <div class="search"><span>🔍</span><input id="vsearch" placeholder="搜索单词 / 释义…"></div>
+          <div class="chips" id="vchips">
+            <span class="chip active" data-f="all">全部</span>
+            <span class="chip" data-f="learning">🔥 学习中</span>
+            <span class="chip" data-f="mastered">✅ 已掌握</span>
+          </div>
+        </div>
+        <div id="wordList" class="job-list"></div>
+      </section>
+
+      <section id="view-wrong" class="view">
+        <div class="note">❌ 错题来自 [[错题记录模板]]，按科目（听力/阅读/词汇/写作/翻译）分类，定期回顾防重犯。</div>
+        <div class="stat-grid">
+          <div class="stat-card p4"><div class="em">❌</div><div class="lab">错题总数</div><div class="num" id="wTotal">0</div></div>
+          <div class="stat-card p2"><div class="em">👂</div><div class="lab">听力</div><div class="num" id="wSub0">0</div></div>
+          <div class="stat-card p3"><div class="em">📖</div><div class="lab">阅读</div><div class="num" id="wSub1">0</div></div>
+          <div class="stat-card p1"><div class="em">🔤</div><div class="lab">词汇</div><div class="num" id="wSub2">0</div></div>
+          <div class="stat-card p3"><div class="em">✍️</div><div class="lab">写作</div><div class="num" id="wSub3">0</div></div>
+          <div class="stat-card p2"><div class="em">🀄</div><div class="lab">翻译</div><div class="num" id="wSub4">0</div></div>
+        </div>
+        <div class="filterbar">
+          <div class="chips" id="wchips">
+            <span class="chip active" data-f="all">全部</span>
+            <span class="chip" data-f="听力">👂 听力</span>
+            <span class="chip" data-f="阅读">📖 阅读</span>
+            <span class="chip" data-f="词汇">🔤 词汇</span>
+            <span class="chip" data-f="写作">✍️ 写作</span>
+            <span class="chip" data-f="翻译">🀄 翻译</span>
+          </div>
+        </div>
+        <div id="wrongList" class="job-list"></div>
+      </section>
+
+      <section id="view-skills" class="view">
+        <div class="note">🎓 分项训练对应五维目标（听力40 / 阅读80 / 写作30 / 翻译60），点卡片看完整学习指南。</div>
+        <div id="skillGrid" class="kb-grid"></div>
+      </section>
+
+      <section id="view-materials" class="view">
+        <div class="note">📎 精选备考资料来自工作台「学习资料」模块，按词汇 / 写作 / 翻译 / 真题 / 听力分类整理。</div>
+        <div id="matList"></div>
+      </section>
+
+      <section id="view-knowledge" class="view">
+        <div class="note">🐾 全部文件夹都可以点开看内容，笔记全文自动从 Obsidian 知识库同步。</div>
+        <div class="kb-grid" id="kbGrid"></div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <span class="m-close" onclick="closeModal()">✕</span>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <div class="bn-item active" data-go="home"><span class="ic">🎯</span>看板</div>
+  <div class="bn-item" data-go="vocab"><span class="ic">📖</span>词汇</div>
+  <div class="bn-item" data-go="wrong"><span class="ic">❌</span>错题</div>
+  <div class="bn-item" data-go="skills"><span class="ic">🎓</span>训练</div>
+  <div class="bn-item" data-go="materials"><span class="ic">📎</span>资料</div>
+  <div class="bn-item" data-go="knowledge"><span class="ic">📚</span>知识库</div>
+</nav>
+
+<div id="floats"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+window.SITE_DATA = {
+ "updated": "2026-08-26 19:15",
+ "exam": {
+  "date": "2026-12-12",
+  "days": 108
+ },
+ "stats": {
+  "days": 108,
+  "checkin": 0,
+  "words": 1,
+  "mastered": 0,
+  "wrong": 1,
+  "avg": 0
+ },
+ "tasks": [
+  {
+   "key": "words",
+   "name": "背诵单词 100 个",
+   "advice": "配合生词本/词书，滚动记忆"
+  },
+  {
+   "key": "listening",
+   "name": "听力精听 1 套",
+   "advice": "精听 + 对照原文 + 跟读"
+  },
+  {
+   "key": "reading",
+   "name": "仔细阅读 2 篇",
+   "advice": "计时训练，控制节奏"
+  },
+  {
+   "key": "writing",
+   "name": "写作或翻译练习 1 篇",
+   "advice": "两科交替进行"
+  },
+  {
+   "key": "review",
+   "name": "复习昨日生词",
+   "advice": "巩固记忆曲线"
+  }
+ ],
+ "week": [
+  {
+   "day": "一",
+   "done": false
+  },
+  {
+   "day": "二",
+   "done": false
+  },
+  {
+   "day": "三",
+   "done": false
+  },
+  {
+   "day": "四",
+   "done": false
+  },
+  {
+   "day": "五",
+   "done": false
+  },
+  {
+   "day": "六",
+   "done": false
+  },
+  {
+   "day": "日",
+   "done": false
+  }
+ ],
+ "progress": [
+  {
+   "dim": "单词",
+   "target": 6000,
+   "done": 0,
+   "pct": 0
+  },
+  {
+   "dim": "听力",
+   "target": 40,
+   "done": 0,
+   "pct": 0
+  },
+  {
+   "dim": "阅读",
+   "target": 80,
+   "done": 0,
+   "pct": 0
+  },
+  {
+   "dim": "写作",
+   "target": 30,
+   "done": 0,
+   "pct": 0
+  },
+  {
+   "dim": "翻译",
+   "target": 60,
+   "done": 0,
+   "pct": 0
+  }
+ ],
+ "words": [
+  {
+   "word": "abandon",
+   "meaning": "v. 放弃，抛弃",
+   "example": "He abandoned his car.",
+   "status": "学习中",
+   "review": 0,
+   "last": "—"
+  }
+ ],
+ "wrong": [
+  {
+   "subject": "听力",
+   "source": "真题2023年6月",
+   "summary": "第5题没听清",
+   "analysis": "连读没听出来",
+   "status": "待复习"
+  }
+ ],
+ "skills": [
+  {
+   "key": "听力",
+   "icon": "🎧",
+   "title": "听力学习指南",
+   "desc": "听力精听 · 四步法",
+   "goal": "目标 40 套",
+   "cls": "c1",
+   "html": "<h1>🎧 听力学习指南</h1>\n<blockquote>\n<p>对应工作台「今日任务 · 听力精听 1 套」，备考目标：精听 <strong>40 套</strong>。</p>\n</blockquote>\n<h2>每日任务</h2>\n<ul>\n<li>[ ] 听力精听 1 套</li>\n<li>[ ] 对答案，错题记录到 错题本使用指南</li>\n</ul>\n<h2>精听四步法</h2>\n<ol>\n<li><strong>盲听</strong>：完整听 1 遍，抓大意与结构</li>\n<li><strong>精听</strong>：逐句听，尝试听写关键句，标记没听懂的地方</li>\n<li><strong>对照</strong>：对照原文，找出连读、弱读、吞音</li>\n<li><strong>跟读</strong>：模仿语音语调，跟读 2-3 遍</li>\n</ol>\n<h2>常见丢分点</h2>\n<ul>\n<li>数字、时间、地点细节</li>\n<li>转折词后的关键信息（but / however）</li>\n<li>同义替换（原文与选项）</li>\n<li>连读与弱读导致听辨失败</li>\n</ul>\n<h2>资料</h2>\n<ul>\n<li>精选备考资料汇总#听力 — 听力氪金 60 题（斐姐独家）</li>\n<li>六级真题听力音频 + 解析</li>\n</ul>\n<h2>相关</h2>\n<ul>\n<li>备考总览 · 错题本使用指南</li>\n</ul>"
+  },
+  {
+   "key": "阅读",
+   "icon": "📖",
+   "title": "阅读学习指南",
+   "desc": "仔细阅读 · 先题后文",
+   "goal": "目标 80 篇",
+   "cls": "c3",
+   "html": "<h1>📖 阅读学习指南</h1>\n<blockquote>\n<p>对应工作台「今日任务 · 仔细阅读 2 篇」，备考目标：精做 <strong>80 篇</strong>。</p>\n</blockquote>\n<h2>每日任务</h2>\n<ul>\n<li>[ ] 仔细阅读 2 篇（计时完成）</li>\n<li>[ ] 复盘错题，记录到 错题本使用指南</li>\n</ul>\n<h2>做题方法</h2>\n<ol>\n<li><strong>先题后文</strong>：先读题干，圈关键词</li>\n<li><strong>定位原文</strong>：按关键词回原文定位，注意同义替换</li>\n<li><strong>控制节奏</strong>：每篇约 8-10 分钟</li>\n<li><strong>复盘</strong>：逐题分析错因（词汇 / 定位 / 理解 / 逻辑）</li>\n</ol>\n<h2>六级阅读构成</h2>\n<table>\n<thead>\n<tr>\n<th>题型</th>\n<th>建议用时</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>选词填空</td>\n<td>7 分钟</td>\n</tr>\n<tr>\n<td>长篇阅读（匹配）</td>\n<td>10 分钟</td>\n</tr>\n<tr>\n<td>仔细阅读 ×2</td>\n<td>20 分钟</td>\n</tr>\n</tbody>\n</table>\n<h2>长难句处理</h2>\n<ul>\n<li>先抓主干（主谓宾）</li>\n<li>再拆从句与修饰成分</li>\n<li>积累高频长难句结构</li>\n</ul>\n<h2>相关</h2>\n<ul>\n<li>备考总览 · 错题本使用指南 · 生词本使用指南</li>\n</ul>"
+  },
+  {
+   "key": "写作",
+   "icon": "✍️",
+   "title": "写作学习指南",
+   "desc": "三段式写作 · 主题词",
+   "goal": "目标 30 篇",
+   "cls": "c4",
+   "html": "<h1>✍️ 写作学习指南</h1>\n<blockquote>\n<p>对应工作台「今日任务 · 写作或翻译练习 1 篇」，备考目标：写作 <strong>30 篇</strong>。</p>\n</blockquote>\n<h2>每日任务</h2>\n<ul>\n<li>[ ] 写作或翻译练习 1 篇（两科交替）</li>\n<li>[ ] 积累主题词与高级表达</li>\n</ul>\n<h2>写作结构（三段式）</h2>\n<ol>\n<li><strong>开头</strong>：引入话题 + 亮明观点</li>\n<li><strong>主体</strong>：2-3 个论点 + 论据展开</li>\n<li><strong>结尾</strong>：总结 + 展望/建议</li>\n</ol>\n<h2>主题词积累</h2>\n<ul>\n<li>高频主题：教育、科技、环境、社会、文化、健康</li>\n<li>参考 精选备考资料汇总#写作 — 26 年四六级考研写作主题词</li>\n</ul>\n<h2>提分要点</h2>\n<ul>\n<li>用稍高级的词汇替换基础词（如 important → vital / crucial）</li>\n<li>句式多样化：定语从句、状语从句、倒装、强调句</li>\n<li>避免中式表达与语法硬伤</li>\n<li>背诵 2-3 个万能模板，灵活套用</li>\n</ul>\n<h2>相关</h2>\n<ul>\n<li>备考总览 · 精选备考资料汇总#写作</li>\n</ul>"
+  },
+  {
+   "key": "翻译",
+   "icon": "🀄",
+   "title": "翻译学习指南",
+   "desc": "翻译四步法 · 高频考点",
+   "goal": "目标 60 篇",
+   "cls": "c2",
+   "html": "<h1>🔤 翻译学习指南</h1>\n<blockquote>\n<p>对应工作台「今日任务 · 写作或翻译练习 1 篇」，备考目标：翻译 <strong>60 篇</strong>。</p>\n</blockquote>\n<h2>每日任务</h2>\n<ul>\n<li>[ ] 写作或翻译练习 1 篇（两科交替）</li>\n<li>[ ] 对照参考译文，总结失分点</li>\n</ul>\n<h2>翻译四步法</h2>\n<ol>\n<li><strong>通读</strong>：理解整段语义，抓主题</li>\n<li><strong>断句</strong>：划分意群，确定主谓结构</li>\n<li><strong>直译 + 调整</strong>：先直译，再按英文习惯调整语序</li>\n<li><strong>检查</strong>：时态、主谓一致、单复数、搭配</li>\n</ol>\n<h2>高频考点</h2>\n<ul>\n<li>中国文化类：传统节日、非遗、名胜、典故</li>\n<li>社会现象类：经济、民生、科技、教育</li>\n<li>固定搭配与中国特色词汇的英文表达</li>\n</ul>\n<h2>资料</h2>\n<ul>\n<li>精选备考资料汇总#翻译 — 翻译精准预测 30 题、四六级翻译精准预测</li>\n</ul>\n<h2>相关</h2>\n<ul>\n<li>备考总览 · 精选备考资料汇总#翻译</li>\n</ul>"
+  }
+ ],
+ "materials": [
+  {
+   "cat": "词汇",
+   "items": [
+    {
+     "title": "四六级核心考点 1250 词",
+     "url": "https://aka.doubaocdn.com/s/XTWPQVIBmN",
+     "desc": ""
+    },
+    {
+     "title": "六级核心 2000 词",
+     "url": "https://aka.doubaocdn.com/s/A7NFLc92kc",
+     "desc": ""
+    }
+   ]
+  },
+  {
+   "cat": "写作",
+   "items": [
+    {
+     "title": "26 年四六级考研写作主题词",
+     "url": "https://aka.doubaocdn.com/s/neMoqeuUKy",
+     "desc": ""
+    }
+   ]
+  },
+  {
+   "cat": "翻译",
+   "items": [
+    {
+     "title": "翻译精准预测 30 题",
+     "url": "https://aka.doubaocdn.com/s/Mznbo8UFQ1",
+     "desc": ""
+    },
+    {
+     "title": "四六级翻译精准预测",
+     "url": "https://aka.doubaocdn.com/s/SpE9fU3AaF",
+     "desc": ""
+    }
+   ]
+  },
+  {
+   "cat": "真题",
+   "items": [
+    {
+     "title": "六级真题 + 音频 + 解析",
+     "url": "https://pan.baidu.com/s/1K8xs9f7a0fYpxkdj5wrPTw?pwd=nq3c",
+     "desc": "提取码 nq3c"
+    },
+    {
+     "title": "六级模拟卷全 10 套",
+     "url": "https://pan.baidu.com/s/128ImuV5b26OpTcP_FTxjAg?pwd=66ay",
+     "desc": "提取码 66ay"
+    }
+   ]
+  },
+  {
+   "cat": "听力",
+   "items": [
+    {
+     "title": "听力氪金 60 题【斐姐独家】",
+     "url": "https://pan.baidu.com/s/13VW0PwK12ICTqhOnqhAfrQ?pwd=9qfd",
+     "desc": "提取码 9qfd"
+    }
+   ]
+  }
+ ],
+ "ai": "<h1>🤖 AI 备考助手</h1>\n<blockquote>\n<p>本节内容由 AI 根据你的备考进度动态生成，会随知识库更新自动同步到看板。想更新建议时，在豆包中告诉我你的最新进度即可。</p>\n</blockquote>\n<h2>📌 当前阶段建议（2026-08-26 生成）</h2>\n<p>距考试（2026-12-12）还有约 <strong>108 天</strong>，当前处于 <strong>基础期 → 强化期</strong> 过渡阶段，核心策略如下：</p>\n<h3>1. 词汇（目标 6000）</h3>\n<ul>\n<li><strong>每天 100 词</strong>：用生词表滚动记录，重点记高频词与真题词</li>\n<li><strong>复习优先</strong>：新词 + 复习昨日生词双轨并行，未掌握的每天抽 10 个翻牌复习</li>\n<li><strong>阶段目标</strong>：11 月前完成核心 3000 词一轮</li>\n</ul>\n<h3>2. 听力（目标 40 套）</h3>\n<ul>\n<li>每天精听 1 套，用听力学习指南的四步法（盲听 → 精听 → 对照 → 跟读）</li>\n<li>重点攻克连读、弱读、同义替换三个高频丢分点</li>\n<li>优先使用「听力氪金 60 题」和真题音频</li>\n</ul>\n<h3>3. 阅读（目标 80 篇）</h3>\n<ul>\n<li>每天仔细阅读 2 篇并计时（每篇 8-10 分钟）</li>\n<li>建立错题本使用指南错因标签：词汇 / 定位 / 理解 / 逻辑</li>\n</ul>\n<h3>4. 写作 + 翻译（目标 30 篇 + 60 篇）</h3>\n<ul>\n<li>每天二选一交替练习 1 篇</li>\n<li>写作：背 2-3 个万能模板 + 积累主题词（参考精选备考资料汇总#写作）</li>\n<li>翻译：用翻译学习指南四步法，优先做「翻译精准预测 30 题」</li>\n</ul>\n<h2>🧠 AI 能帮你做什么</h2>\n<ul>\n<li><strong>制定计划</strong>：告诉我你的进度和可用时间，我帮你排周计划</li>\n<li><strong>背词陪练</strong>：把你的生词表发我，我帮你出测验或造句</li>\n<li><strong>作文批改</strong>：写完作文发我，我按六级评分标准批改提分</li>\n<li><strong>错题分析</strong>：把错题发我，我帮你归因并给针对性练习</li>\n<li><strong>模拟出题</strong>：按六级真题风格帮你出听力 / 阅读 / 翻译练习题</li>\n</ul>\n<h2>🔄 联动说明</h2>\n<p>本知识库与网页看板通过构建脚本联动：在豆包中让我更新上面的笔记 → 运行「六级看板同步」→ 网页自动更新。同步原理：Obsidian 笔记 → <code>build_site.py</code> 生成 → Git 推送到 GitHub Pages。</p>",
+ "kb": [
+  {
+   "icon": "🎯",
+   "name": "00-备考总览",
+   "desc": "目标、计划、打卡、AI 助手与工作台说明",
+   "cls": "c1",
+   "groups": [
+    {
+     "title": "",
+     "notes": [
+      {
+       "title": "AI备考助手",
+       "icon": "📄",
+       "html": "<h1>🤖 AI 备考助手</h1>\n<blockquote>\n<p>本节内容由 AI 根据你的备考进度动态生成，会随知识库更新自动同步到看板。想更新建议时，在豆包中告诉我你的最新进度即可。</p>\n</blockquote>\n<h2>📌 当前阶段建议（2026-08-26 生成）</h2>\n<p>距考试（2026-12-12）还有约 <strong>108 天</strong>，当前处于 <strong>基础期 → 强化期</strong> 过渡阶段，核心策略如下：</p>\n<h3>1. 词汇（目标 6000）</h3>\n<ul>\n<li><strong>每天 100 词</strong>：用生词表滚动记录，重点记高频词与真题词</li>\n<li><strong>复习优先</strong>：新词 + 复习昨日生词双轨并行，未掌握的每天抽 10 个翻牌复习</li>\n<li><strong>阶段目标</strong>：11 月前完成核心 3000 词一轮</li>\n</ul>\n<h3>2. 听力（目标 40 套）</h3>\n<ul>\n<li>每天精听 1 套，用听力学习指南的四步法（盲听 → 精听 → 对照 → 跟读）</li>\n<li>重点攻克连读、弱读、同义替换三个高频丢分点</li>\n<li>优先使用「听力氪金 60 题」和真题音频</li>\n</ul>\n<h3>3. 阅读（目标 80 篇）</h3>\n<ul>\n<li>每天仔细阅读 2 篇并计时（每篇 8-10 分钟）</li>\n<li>建立错题本使用指南错因标签：词汇 / 定位 / 理解 / 逻辑</li>\n</ul>\n<h3>4. 写作 + 翻译（目标 30 篇 + 60 篇）</h3>\n<ul>\n<li>每天二选一交替练习 1 篇</li>\n<li>写作：背 2-3 个万能模板 + 积累主题词（参考精选备考资料汇总#写作）</li>\n<li>翻译：用翻译学习指南四步法，优先做「翻译精准预测 30 题」</li>\n</ul>\n<h2>🧠 AI 能帮你做什么</h2>\n<ul>\n<li><strong>制定计划</strong>：告诉我你的进度和可用时间，我帮你排周计划</li>\n<li><strong>背词陪练</strong>：把你的生词表发我，我帮你出测验或造句</li>\n<li><strong>作文批改</strong>：写完作文发我，我按六级评分标准批改提分</li>\n<li><strong>错题分析</strong>：把错题发我，我帮你归因并给针对性练习</li>\n<li><strong>模拟出题</strong>：按六级真题风格帮你出听力 / 阅读 / 翻译练习题</li>\n</ul>\n<h2>🔄 联动说明</h2>\n<p>本知识库与网页看板通过构建脚本联动：在豆包中让我更新上面的笔记 → 运行「六级看板同步」→ 网页自动更新。同步原理：Obsidian 笔记 → <code>build_site.py</code> 生成 → Git 推送到 GitHub Pages。</p>"
+      },
+      {
+       "title": "备考总览",
+       "icon": "📄",
+       "html": "<h1>🎯 备考总览</h1>\n<blockquote>\n<p>[!info] 考试信息\n- <strong>考试日期</strong>：2026-12-12（周六）\n- <strong>当前倒计时</strong>：约 <strong>108 天</strong>\n- <strong>目标</strong>：六级通过 / 高分冲刺\n- <strong>时间分配参考</strong>：写作 30 分钟 → 听力 25 分钟 → 阅读 40 分钟 → 翻译 30 分钟</p>\n</blockquote>\n<h2>备考五维目标</h2>\n<table>\n<thead>\n<tr>\n<th>维度</th>\n<th>目标值</th>\n<th>对应笔记</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>单词</td>\n<td>6000</td>\n<td>生词本使用指南</td>\n</tr>\n<tr>\n<td>听力</td>\n<td>40 套</td>\n<td>听力学习指南</td>\n</tr>\n<tr>\n<td>阅读</td>\n<td>80 篇</td>\n<td>阅读学习指南</td>\n</tr>\n<tr>\n<td>写作</td>\n<td>30 篇</td>\n<td>写作学习指南</td>\n</tr>\n<tr>\n<td>翻译</td>\n<td>60 篇</td>\n<td>翻译学习指南</td>\n</tr>\n</tbody>\n</table>\n<h2>每日任务（5 项）</h2>\n<ul>\n<li>[ ] 背诵单词 100 个</li>\n<li>[ ] 听力精听 1 套</li>\n<li>[ ] 仔细阅读 2 篇</li>\n<li>[ ] 写作或翻译练习 1 篇</li>\n<li>[ ] 复习昨日生词</li>\n</ul>\n<blockquote>\n<p>[!tip] 打卡规则\n当日 5 项任务全部完成 = 当日打卡成功 🐾</p>\n</blockquote>\n<h2>📂 知识库地图</h2>\n<table>\n<thead>\n<tr>\n<th>分类</th>\n<th>笔记</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>备考管理</td>\n<td>备考进度目标 · 每日任务与打卡规则 · 学习工作台使用说明</td>\n</tr>\n<tr>\n<td>词汇</td>\n<td>生词本使用指南 · 生词表</td>\n</tr>\n<tr>\n<td>错题</td>\n<td>错题本使用指南 · 错题记录模板</td>\n</tr>\n<tr>\n<td>分项训练</td>\n<td>听力学习指南 · 阅读学习指南 · 写作学习指南 · 翻译学习指南</td>\n</tr>\n<tr>\n<td>资料</td>\n<td>精选备考资料汇总</td>\n</tr>\n</tbody>\n</table>"
+      },
+      {
+       "title": "备考进度目标",
+       "icon": "📄",
+       "html": "<h1>📈 备考进度目标</h1>\n<h2>五维目标</h2>\n<table>\n<thead>\n<tr>\n<th>维度</th>\n<th>目标值</th>\n<th>已完成</th>\n<th>进度</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>单词</td>\n<td>6000</td>\n<td>0</td>\n<td>0%</td>\n</tr>\n<tr>\n<td>听力</td>\n<td>40 套</td>\n<td>0</td>\n<td>0%</td>\n</tr>\n<tr>\n<td>阅读</td>\n<td>80 篇</td>\n<td>0</td>\n<td>0%</td>\n</tr>\n<tr>\n<td>写作</td>\n<td>30 篇</td>\n<td>0</td>\n<td>0%</td>\n</tr>\n<tr>\n<td>翻译</td>\n<td>60 篇</td>\n<td>0</td>\n<td>0%</td>\n</tr>\n</tbody>\n</table>\n<blockquote>\n<p>[!tip] 使用建议\n- 每周日更新「已完成」列，复盘本周进度\n- 参考日期：2026-08-26 起约 108 天到考试</p>\n</blockquote>\n<h2>阶段划分（建议）</h2>\n<table>\n<thead>\n<tr>\n<th>阶段</th>\n<th>时间</th>\n<th>重点</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>基础期</td>\n<td>8 月下 – 10 月</td>\n<td>词汇攻坚 + 听力精听 + 方法入门</td>\n</tr>\n<tr>\n<td>强化期</td>\n<td>11 月</td>\n<td>真题套卷 + 错题复盘 + 写作翻译模板</td>\n</tr>\n<tr>\n<td>冲刺期</td>\n<td>12 月</td>\n<td>全真模拟 + 高频错题 + 作文押题</td>\n</tr>\n</tbody>\n</table>"
+      },
+      {
+       "title": "学习工作台使用说明",
+       "icon": "📄",
+       "html": "<h1>🐱 学习工作台使用说明</h1>\n<blockquote>\n<p>这是「喵咪备考 · 六级陪伴打卡」网页工作台的使用说明。工作台负责<strong>打卡、记录、云端同步</strong>，本知识库负责<strong>沉淀笔记、整理资料</strong>，两者配合使用。</p>\n</blockquote>\n<h2>模块总览</h2>\n<table>\n<thead>\n<tr>\n<th>页面</th>\n<th>模块</th>\n<th>用途</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>首页</td>\n<td>仪表盘</td>\n<td>考试倒计时、本周打卡、今日任务、备考进度、专注计时、学习时长图表</td>\n</tr>\n<tr>\n<td>错题</td>\n<td>错题本</td>\n<td>按 5 科目分类管理错题</td>\n</tr>\n<tr>\n<td>生词</td>\n<td>生词本</td>\n<td>生词录入、批量导入、今日复习抽背</td>\n</tr>\n<tr>\n<td>资料</td>\n<td>资料入口</td>\n<td>官方预置资料 + 我的自定义资料</td>\n</tr>\n</tbody>\n</table>\n<h2>核心功能</h2>\n<ul>\n<li><strong>打卡</strong>：完成当日 5 项任务自动打卡，支持连续打卡统计（回溯 60 天）</li>\n<li><strong>生词本</strong>：手动新增 / 拍照识别 / 语音录入 / 批量导入；今日复习随机抽 10 个未掌握词</li>\n<li><strong>错题本</strong>：手动录入 / 拍照识别 / 批量导入，按听力、阅读、词汇、写作、翻译筛选</li>\n<li><strong>专注计时</strong>：记录每日学习时长，≥60 秒可保存；支持手动补记</li>\n<li><strong>备考进度</strong>：5 维度目标值（单词 6000 / 听力 40 / 阅读 80 / 写作 30 / 翻译 60），支持 ±1 / +5 快捷调整</li>\n<li><strong>数据同步</strong>：账号云端同步</li>\n</ul>\n<h2>设计风格</h2>\n<ul>\n<li>暖橘主色 + 奶油米背景，橘猫吉祥物，温暖治愈、萌系陪伴</li>\n<li>移动端优先，底部 Tab 导航（首页 / 错题 / 生词 / 资料）</li>\n</ul>\n<h2>相关笔记</h2>\n<ul>\n<li>备考总览 · 生词本使用指南 · 错题本使用指南 · 精选备考资料汇总</li>\n</ul>"
+      },
+      {
+       "title": "每日任务与打卡规则",
+       "icon": "📄",
+       "html": "<h1>📅 每日任务与打卡规则</h1>\n<h2>今日任务（5 项）</h2>\n<table>\n<thead>\n<tr>\n<th>任务 key</th>\n<th>名称</th>\n<th>执行建议</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>words</td>\n<td>背诵单词 100 个</td>\n<td>配合生词本/词书，滚动记忆</td>\n</tr>\n<tr>\n<td>listening</td>\n<td>听力精听 1 套</td>\n<td>精听 + 对照原文 + 跟读</td>\n</tr>\n<tr>\n<td>reading</td>\n<td>仔细阅读 2 篇</td>\n<td>计时训练，控制节奏</td>\n</tr>\n<tr>\n<td>writing</td>\n<td>写作或翻译练习 1 篇</td>\n<td>两科交替进行</td>\n</tr>\n<tr>\n<td>review</td>\n<td>复习昨日生词</td>\n<td>巩固记忆曲线</td>\n</tr>\n</tbody>\n</table>\n<h2>打卡规则</h2>\n<ul>\n<li><strong>判定</strong>：当日 5 项任务全部完成 = 当日打卡成功</li>\n<li><strong>连续打卡</strong>：从今天往前数连续有记录的天数（最多回溯 60 天）</li>\n<li><strong>完成提示</strong>：太棒了！今日任务全部完成 🎉</li>\n</ul>\n<h2>本周打卡记录</h2>\n<table>\n<thead>\n<tr>\n<th>一</th>\n<th>二</th>\n<th>三</th>\n<th>四</th>\n<th>五</th>\n<th>六</th>\n<th>日</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>☐</td>\n<td>☐</td>\n<td>☐</td>\n<td>☐</td>\n<td>☐</td>\n<td>☐</td>\n<td>☐</td>\n</tr>\n</tbody>\n</table>\n<blockquote>\n<p>[!note] 连续打卡目标\n目标坚持到考试当天，形成每日固定学习节奏。</p>\n</blockquote>"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "icon": "📖",
+   "name": "01-词汇",
+   "desc": "生词本规则与生词表",
+   "cls": "c2",
+   "groups": [
+    {
+     "title": "",
+     "notes": [
+      {
+       "title": "生词本使用指南",
+       "icon": "📄",
+       "html": "<h1>📖 生词本使用指南</h1>\n<blockquote>\n<p>对应工作台「生词本」模块，本笔记用于沉淀生词规则与复习方法，生词表 用于实际记录。</p>\n</blockquote>\n<h2>数据字段</h2>\n<table>\n<thead>\n<tr>\n<th>字段</th>\n<th>说明</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>word</td>\n<td>单词（必填，最多 100 字符）</td>\n</tr>\n<tr>\n<td>meaning</td>\n<td>释义（必填）</td>\n</tr>\n<tr>\n<td>example</td>\n<td>例句（可选）</td>\n</tr>\n<tr>\n<td>mastered</td>\n<td>是否已掌握（默认否）</td>\n</tr>\n<tr>\n<td>reviewCount</td>\n<td>复习次数（默认 0）</td>\n</tr>\n<tr>\n<td>lastReviewedAt</td>\n<td>上次复习时间</td>\n</tr>\n</tbody>\n</table>\n<h2>录入方式</h2>\n<ol>\n<li><strong>手动新增</strong>：单词 + 释义 + 例句</li>\n<li><strong>批量导入</strong>：JSON 数组格式</li>\n<li><strong>拍照识别</strong>：AI 从图片提取单词/释义/例句，可编辑后保存</li>\n<li><strong>语音录入</strong>：录音转文字，短文本填单词、长句子填例句</li>\n</ol>\n<h2>批量导入模板</h2>\n<pre><code class=\"language-json\">[\n  { &quot;word&quot;: &quot;abandon&quot;, &quot;meaning&quot;: &quot;v. 放弃，抛弃&quot;, &quot;example&quot;: &quot;He abandoned his car.&quot; }\n]\n</code></pre>\n<h2>复习流程</h2>\n<ol>\n<li>每次随机抽取 <strong>10 个未掌握单词</strong></li>\n<li>先看单词 → 点「显示释义」</li>\n<li>判断「不认识」/「记得了」</li>\n<li>记住的自动标记为「已掌握」并记录复习次数</li>\n<li>完成页：本次复习 X 个，记住 Y 个，继续加油！🐾</li>\n</ol>\n<h2>状态与筛选</h2>\n<ul>\n<li>Tab：全部 / 未掌握 / 已掌握</li>\n<li>标签：学习中（未掌握）· 已掌握（绿色）</li>\n</ul>\n<h2>相关</h2>\n<ul>\n<li>生词表 — 记录表</li>\n<li>精选备考资料汇总#词汇 — 词汇资料</li>\n<li>备考总览 — 单词目标 6000</li>\n</ul>"
+      },
+      {
+       "title": "生词表",
+       "icon": "📄",
+       "html": "<h1>📝 生词表</h1>\n<blockquote>\n<p>在此手动记录生词；或在工作台「生词本」录入后，由助手帮你导出同步到这里。</p>\n</blockquote>\n<table>\n<thead>\n<tr>\n<th>单词</th>\n<th>释义</th>\n<th>例句</th>\n<th>状态</th>\n<th>复习次数</th>\n<th>上次复习</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>abandon</td>\n<td>v. 放弃，抛弃</td>\n<td>He abandoned his car.</td>\n<td>学习中</td>\n<td>0</td>\n<td>—</td>\n</tr>\n<tr>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n</tr>\n</tbody>\n</table>\n<blockquote>\n<p>[!tip] 复习节奏\n建议使用艾宾浩斯间隔：第 1、2、4、7、15 天各复习一次。</p>\n</blockquote>"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "icon": "🎧",
+   "name": "02-听力",
+   "desc": "听力精听方法",
+   "cls": "c3",
+   "groups": [
+    {
+     "title": "",
+     "notes": [
+      {
+       "title": "听力学习指南",
+       "icon": "📄",
+       "html": "<h1>🎧 听力学习指南</h1>\n<blockquote>\n<p>对应工作台「今日任务 · 听力精听 1 套」，备考目标：精听 <strong>40 套</strong>。</p>\n</blockquote>\n<h2>每日任务</h2>\n<ul>\n<li>[ ] 听力精听 1 套</li>\n<li>[ ] 对答案，错题记录到 错题本使用指南</li>\n</ul>\n<h2>精听四步法</h2>\n<ol>\n<li><strong>盲听</strong>：完整听 1 遍，抓大意与结构</li>\n<li><strong>精听</strong>：逐句听，尝试听写关键句，标记没听懂的地方</li>\n<li><strong>对照</strong>：对照原文，找出连读、弱读、吞音</li>\n<li><strong>跟读</strong>：模仿语音语调，跟读 2-3 遍</li>\n</ol>\n<h2>常见丢分点</h2>\n<ul>\n<li>数字、时间、地点细节</li>\n<li>转折词后的关键信息（but / however）</li>\n<li>同义替换（原文与选项）</li>\n<li>连读与弱读导致听辨失败</li>\n</ul>\n<h2>资料</h2>\n<ul>\n<li>精选备考资料汇总#听力 — 听力氪金 60 题（斐姐独家）</li>\n<li>六级真题听力音频 + 解析</li>\n</ul>\n<h2>相关</h2>\n<ul>\n<li>备考总览 · 错题本使用指南</li>\n</ul>"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "icon": "📚",
+   "name": "03-阅读",
+   "desc": "阅读做题方法",
+   "cls": "c4",
+   "groups": [
+    {
+     "title": "",
+     "notes": [
+      {
+       "title": "阅读学习指南",
+       "icon": "📄",
+       "html": "<h1>📖 阅读学习指南</h1>\n<blockquote>\n<p>对应工作台「今日任务 · 仔细阅读 2 篇」，备考目标：精做 <strong>80 篇</strong>。</p>\n</blockquote>\n<h2>每日任务</h2>\n<ul>\n<li>[ ] 仔细阅读 2 篇（计时完成）</li>\n<li>[ ] 复盘错题，记录到 错题本使用指南</li>\n</ul>\n<h2>做题方法</h2>\n<ol>\n<li><strong>先题后文</strong>：先读题干，圈关键词</li>\n<li><strong>定位原文</strong>：按关键词回原文定位，注意同义替换</li>\n<li><strong>控制节奏</strong>：每篇约 8-10 分钟</li>\n<li><strong>复盘</strong>：逐题分析错因（词汇 / 定位 / 理解 / 逻辑）</li>\n</ol>\n<h2>六级阅读构成</h2>\n<table>\n<thead>\n<tr>\n<th>题型</th>\n<th>建议用时</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>选词填空</td>\n<td>7 分钟</td>\n</tr>\n<tr>\n<td>长篇阅读（匹配）</td>\n<td>10 分钟</td>\n</tr>\n<tr>\n<td>仔细阅读 ×2</td>\n<td>20 分钟</td>\n</tr>\n</tbody>\n</table>\n<h2>长难句处理</h2>\n<ul>\n<li>先抓主干（主谓宾）</li>\n<li>再拆从句与修饰成分</li>\n<li>积累高频长难句结构</li>\n</ul>\n<h2>相关</h2>\n<ul>\n<li>备考总览 · 错题本使用指南 · 生词本使用指南</li>\n</ul>"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "icon": "✍️",
+   "name": "04-写作",
+   "desc": "写作结构与主题词",
+   "cls": "c5",
+   "groups": [
+    {
+     "title": "",
+     "notes": [
+      {
+       "title": "写作学习指南",
+       "icon": "📄",
+       "html": "<h1>✍️ 写作学习指南</h1>\n<blockquote>\n<p>对应工作台「今日任务 · 写作或翻译练习 1 篇」，备考目标：写作 <strong>30 篇</strong>。</p>\n</blockquote>\n<h2>每日任务</h2>\n<ul>\n<li>[ ] 写作或翻译练习 1 篇（两科交替）</li>\n<li>[ ] 积累主题词与高级表达</li>\n</ul>\n<h2>写作结构（三段式）</h2>\n<ol>\n<li><strong>开头</strong>：引入话题 + 亮明观点</li>\n<li><strong>主体</strong>：2-3 个论点 + 论据展开</li>\n<li><strong>结尾</strong>：总结 + 展望/建议</li>\n</ol>\n<h2>主题词积累</h2>\n<ul>\n<li>高频主题：教育、科技、环境、社会、文化、健康</li>\n<li>参考 精选备考资料汇总#写作 — 26 年四六级考研写作主题词</li>\n</ul>\n<h2>提分要点</h2>\n<ul>\n<li>用稍高级的词汇替换基础词（如 important → vital / crucial）</li>\n<li>句式多样化：定语从句、状语从句、倒装、强调句</li>\n<li>避免中式表达与语法硬伤</li>\n<li>背诵 2-3 个万能模板，灵活套用</li>\n</ul>\n<h2>相关</h2>\n<ul>\n<li>备考总览 · 精选备考资料汇总#写作</li>\n</ul>"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "icon": "🀄",
+   "name": "05-翻译",
+   "desc": "翻译步骤与考点",
+   "cls": "c1",
+   "groups": [
+    {
+     "title": "",
+     "notes": [
+      {
+       "title": "翻译学习指南",
+       "icon": "📄",
+       "html": "<h1>🔤 翻译学习指南</h1>\n<blockquote>\n<p>对应工作台「今日任务 · 写作或翻译练习 1 篇」，备考目标：翻译 <strong>60 篇</strong>。</p>\n</blockquote>\n<h2>每日任务</h2>\n<ul>\n<li>[ ] 写作或翻译练习 1 篇（两科交替）</li>\n<li>[ ] 对照参考译文，总结失分点</li>\n</ul>\n<h2>翻译四步法</h2>\n<ol>\n<li><strong>通读</strong>：理解整段语义，抓主题</li>\n<li><strong>断句</strong>：划分意群，确定主谓结构</li>\n<li><strong>直译 + 调整</strong>：先直译，再按英文习惯调整语序</li>\n<li><strong>检查</strong>：时态、主谓一致、单复数、搭配</li>\n</ol>\n<h2>高频考点</h2>\n<ul>\n<li>中国文化类：传统节日、非遗、名胜、典故</li>\n<li>社会现象类：经济、民生、科技、教育</li>\n<li>固定搭配与中国特色词汇的英文表达</li>\n</ul>\n<h2>资料</h2>\n<ul>\n<li>精选备考资料汇总#翻译 — 翻译精准预测 30 题、四六级翻译精准预测</li>\n</ul>\n<h2>相关</h2>\n<ul>\n<li>备考总览 · 精选备考资料汇总#翻译</li>\n</ul>"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "icon": "❌",
+   "name": "06-错题本",
+   "desc": "错题管理与复盘",
+   "cls": "c2",
+   "groups": [
+    {
+     "title": "",
+     "notes": [
+      {
+       "title": "错题本使用指南",
+       "icon": "📄",
+       "html": "<h1>❌ 错题本使用指南</h1>\n<blockquote>\n<p>对应工作台「错题本」模块，按 5 科目分类沉淀错题，定期回顾防重犯。</p>\n</blockquote>\n<h2>数据字段</h2>\n<table>\n<thead>\n<tr>\n<th>字段</th>\n<th>说明</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>subject</td>\n<td>科目（5 选 1）</td>\n</tr>\n<tr>\n<td>source</td>\n<td>题目出处</td>\n</tr>\n<tr>\n<td>summary</td>\n<td>错题简述（必填）</td>\n</tr>\n<tr>\n<td>analysis</td>\n<td>错因分析与心得</td>\n</tr>\n</tbody>\n</table>\n<h2>科目分类</h2>\n<table>\n<thead>\n<tr>\n<th>Key</th>\n<th>中文名</th>\n<th>标签颜色</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>listening</td>\n<td>听力</td>\n<td>橙</td>\n</tr>\n<tr>\n<td>reading</td>\n<td>阅读</td>\n<td>绿</td>\n</tr>\n<tr>\n<td>vocabulary</td>\n<td>词汇</td>\n<td>蓝</td>\n</tr>\n<tr>\n<td>writing</td>\n<td>写作</td>\n<td>粉</td>\n</tr>\n<tr>\n<td>translation</td>\n<td>翻译</td>\n<td>紫</td>\n</tr>\n</tbody>\n</table>\n<h2>批量导入模板</h2>\n<pre><code class=\"language-json\">[\n  { &quot;subject&quot;: &quot;listening&quot;, &quot;source&quot;: &quot;真题2023年6月&quot;, &quot;summary&quot;: &quot;第5题没听清&quot;, &quot;analysis&quot;: &quot;连读没听出来&quot; }\n]\n</code></pre>\n<h2>记录建议</h2>\n<ul>\n<li><strong>出处必写</strong>：哪年哪套真题/模拟卷，方便回查</li>\n<li><strong>错因归类</strong>：词汇 / 连读 / 定位 / 理解 / 逻辑 / 时态等</li>\n<li><strong>定期回顾</strong>：每周翻一次错题本，检验是否真正掌握</li>\n</ul>\n<h2>相关</h2>\n<ul>\n<li>错题记录模板 — 记录表格</li>\n<li>听力学习指南 · 阅读学习指南 · 写作学习指南 · 翻译学习指南 · 生词本使用指南</li>\n</ul>"
+      },
+      {
+       "title": "错题记录模板",
+       "icon": "📄",
+       "html": "<h1>📋 错题记录模板</h1>\n<blockquote>\n<p>复制本模板记录错题，或在工作台「错题本」录入后导出同步。</p>\n</blockquote>\n<h2>错题列表</h2>\n<table>\n<thead>\n<tr>\n<th>科目</th>\n<th>出处</th>\n<th>错题简述</th>\n<th>错因分析与心得</th>\n<th>状态</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>听力</td>\n<td>真题2023年6月</td>\n<td>第5题没听清</td>\n<td>连读没听出来</td>\n<td>待复习</td>\n</tr>\n<tr>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n<td></td>\n</tr>\n</tbody>\n</table>\n<h2>单题复盘模板</h2>\n<pre><code>### [科目] [出处]\n- 题干/原文摘要：\n- 我的答案：____  正确答案：____\n- 错因：☐ 词汇 ☐ 连读 ☐ 定位 ☐ 理解 ☐ 逻辑 ☐ 其他\n- 正确思路：\n- 下次注意：\n</code></pre>\n<blockquote>\n<p>[!tip] 复盘节奏\n每周日统一回顾本周错题，重做一遍检验掌握情况。</p>\n</blockquote>"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "icon": "📎",
+   "name": "07-学习资料",
+   "desc": "精选备考资料汇总",
+   "cls": "c3",
+   "groups": [
+    {
+     "title": "",
+     "notes": [
+      {
+       "title": "精选备考资料汇总",
+       "icon": "📄",
+       "html": "<h1>📚 精选备考资料汇总</h1>\n<blockquote>\n<p>来自工作台「学习资料」模块的官方预置资料，按分类整理。资料来源为工作台配置，点击链接跳转。</p>\n</blockquote>\n<h2>词汇</h2>\n<ul>\n<li><strong>四六级核心考点 1250 词</strong>：<a href=\"https://aka.doubaocdn.com/s/XTWPQVIBmN\">点击查看</a></li>\n<li><strong>六级核心 2000 词</strong>：<a href=\"https://aka.doubaocdn.com/s/A7NFLc92kc\">点击查看</a></li>\n</ul>\n<h2>写作</h2>\n<ul>\n<li><strong>26 年四六级考研写作主题词</strong>：<a href=\"https://aka.doubaocdn.com/s/neMoqeuUKy\">点击查看</a></li>\n</ul>\n<h2>翻译</h2>\n<ul>\n<li><strong>翻译精准预测 30 题</strong>：<a href=\"https://aka.doubaocdn.com/s/Mznbo8UFQ1\">点击查看</a></li>\n<li><strong>四六级翻译精准预测</strong>：<a href=\"https://aka.doubaocdn.com/s/SpE9fU3AaF\">点击查看</a></li>\n</ul>\n<h2>真题</h2>\n<ul>\n<li><strong>六级真题 + 音频 + 解析</strong>：<a href=\"https://pan.baidu.com/s/1K8xs9f7a0fYpxkdj5wrPTw?pwd=nq3c\">百度网盘</a>（提取码 <code>nq3c</code>）</li>\n<li><strong>六级模拟卷全 10 套</strong>：<a href=\"https://pan.baidu.com/s/128ImuV5b26OpTcP_FTxjAg?pwd=66ay\">百度网盘</a>（提取码 <code>66ay</code>）</li>\n</ul>\n<h2>听力</h2>\n<ul>\n<li><strong>听力氪金 60 题【斐姐独家】</strong>：<a href=\"https://pan.baidu.com/s/13VW0PwK12ICTqhOnqhAfrQ?pwd=9qfd\">百度网盘</a>（提取码 <code>9qfd</code>）</li>\n</ul>\n<hr />\n<h2>资料自动分类规则</h2>\n<p>工作台按标题关键词自动归类资料，本地整理时也参考此规则：</p>\n<table>\n<thead>\n<tr>\n<th>分类</th>\n<th>匹配关键词</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>词汇</td>\n<td>词汇 / 单词 / vocabulary / word</td>\n</tr>\n<tr>\n<td>写作</td>\n<td>写作 / 作文 / writing</td>\n</tr>\n<tr>\n<td>翻译</td>\n<td>翻译 / translation / 译文</td>\n</tr>\n<tr>\n<td>真题</td>\n<td>真题 / 考试 / 试卷 / exam / test</td>\n</tr>\n<tr>\n<td>听力</td>\n<td>听力 / listening / 听写</td>\n</tr>\n</tbody>\n</table>\n<blockquote>\n<p>[!tip] 本地资料补充\n在对应分类目录下新建笔记即可沉淀自己的资料；工作台「我的资料」可添加自定义资料。</p>\n</blockquote>"
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "images": {
+  "bg": {
+   "img1": "assets/img1_bg.jpg",
+   "img2": "assets/img2_bg.jpg",
+   "img3": "assets/img3_bg.jpg",
+   "img4": "assets/img4_bg.jpg"
+  },
+  "av": {
+   "img1": "assets/img1_avatar.jpg",
+   "img2": "assets/img2_avatar.jpg",
+   "img3": "assets/img3_avatar.jpg",
+   "img4": "assets/img4_avatar.jpg"
+  }
+ }
+};
+</script>
+<script>
+/* ===== 喵咪备考 · 六级看板 前端逻辑（数据由生成器自动注入） ===== */
+var D = window.SITE_DATA || {};
+var WORDS = D.words || [], WRONG = D.wrong || [], SKILLS = D.skills || [];
+var MATS = D.materials || [], KBS = D.kb || [];
+var IMGS = D.images || {bg:{}, av:{}};
+
+/* ---------- 工具 ---------- */
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function setModal(html){ document.getElementById("modalBody").innerHTML = html; document.getElementById("modal").classList.add("show"); }
+function closeModal(){ document.getElementById("modal").classList.remove("show"); }
+var toastTimer=null;
+function toast(msg){ var t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(function(){t.classList.remove("show");},2200); }
+
+/* ---------- 首页：备考看板 ---------- */
+function renderHome(){
+  var st = D.stats||{};
+  document.getElementById("statDays").textContent = st.days||"0";
+  document.getElementById("statCheck").textContent = st.checkin||0;
+  document.getElementById("statWords").textContent = st.words||0;
+  document.getElementById("statMastered").textContent = st.mastered||0;
+  document.getElementById("statWrong").textContent = st.wrong||0;
+  document.getElementById("statAvg").textContent = (st.avg||0)+"%";
+  // 今日任务
+  var tasks = D.tasks||[];
+  var th = tasks.map(function(t){
+    return '<li><input type="checkbox" data-k="'+esc(t.key)+'"><span><b>'+esc(t.name)+'</b>'+(t.advice?'<div style="font-size:12px;color:var(--muted)">'+esc(t.advice)+'</div>':'')+'</span></li>';
+  }).join("");
+  document.getElementById("taskList").innerHTML = th || '<li style="color:var(--muted)">暂无任务配置</li>';
+  // 本周打卡
+  var week = D.week||[];
+  var doneN = week.filter(function(w){ return w.done; }).length;
+  var wh = week.map(function(w){ return '<span title="周'+esc(w.day)+'" style="display:inline-flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;color:var(--muted)"><b>'+esc(w.day)+'</b><span style="font-size:15px">'+(w.done?'🐾':'☐')+'</span></span>'; }).join("");
+  document.getElementById("taskHint").innerHTML = '本周打卡：'+wh+'<div style="margin-top:6px">连续打卡 X 天 🐾 · 本周已打卡 <b>'+doneN+'</b> / 7 天</div>';
+  // 备考进度
+  var prog = D.progress||[];
+  var ph = prog.map(function(p){
+    var pct = Math.min(100, Math.max(0, p.pct||0));
+    return '<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span><b>'+esc(p.dim)+'</b></span><span style="color:var(--muted)">'+esc(p.done)+' / '+esc(p.target)+'</span></div>'
+      + '<div style="height:10px;border-radius:20px;background:var(--pink-soft);overflow:hidden"><div style="width:'+pct+'%;height:100%;border-radius:20px;background:linear-gradient(90deg,#f97316,#fbbf24)"></div></div>'
+      + '<div style="text-align:right;font-size:11px;color:var(--muted);margin-top:2px">'+pct+'%</div></div>';
+  }).join("");
+  document.getElementById("progressList").innerHTML = ph || '<div style="color:var(--muted)">暂无进度数据</div>';
+  // AI 助手
+  document.getElementById("aiPanel").innerHTML = D.ai || '<p>暂无 AI 建议，在豆包中告诉我你的进度即可生成。</p>';
+}
+
+/* ---------- 词汇 ---------- */
+var curVFilter="all", curVQuery="";
+function renderVocab(){
+  var list = WORDS.filter(function(w){
+    if(curVFilter==="learning" && w.status!=="学习中") return false;
+    if(curVFilter==="mastered" && w.status!=="已掌握") return false;
+    if(curVQuery){ var q=curVQuery.toLowerCase(); if(((w.word||"")+(w.meaning||"")).toLowerCase().indexOf(q)<0) return false; }
+    return true;
+  });
+  var html = list.map(function(w){
+    var mastered = w.status==="已掌握";
+    return '<div class="job-card" onclick="openWord('+WORDS.indexOf(w)+')">'
+      + '<div class="job-top"><div class="job-title"><span class="company">'+esc(w.word)+'</span><span class="pos">'+esc(w.meaning)+'</span></div>'
+      + '<span class="badge '+(mastered?'green':'amber')+'">'+(mastered?'✅':'🔥')+'</span></div>'
+      + (w.example?'<div class="job-meta">💬 '+esc(w.example)+'</div>':'')
+      + '<div class="job-tags"><span class="status '+(mastered?'done':'warn')+'">'+esc(w.status||"学习中")+'</span><span class="level">复习 '+esc(w.review||0)+' 次</span></div></div>';
+  }).join("");
+  document.getElementById("wordList").innerHTML = html || '<div class="card" style="text-align:center;color:var(--muted)">🐾 没有符合条件的生词，去 [[生词表]] 添加吧</div>';
+}
+function openWord(i){
+  var w = WORDS[i]; if(!w) return;
+  setModal('<h2>📖 '+esc(w.word)+'</h2>'
+    + '<div class="m-sub">'+esc(w.meaning)+'</div>'
+    + (w.example?'<div class="m-sec">💬 例句</div><p style="font-size:13.5px">'+esc(w.example)+'</p>':'')
+    + '<div class="m-sec">📌 状态</div><p style="font-size:13.5px">'+esc(w.status||"学习中")+' · 复习 '+esc(w.review||0)+' 次 · 上次复习 '+esc(w.last||"—")+'</p>');
+}
+
+/* ---------- 错题本 ---------- */
+var curWFilter="all";
+var SUBJECTS=["听力","阅读","词汇","写作","翻译"];
+function renderWrongStats(){
+  var total=0, subs=[0,0,0,0,0];
+  WRONG.forEach(function(w){ total++; var k=SUBJECTS.indexOf(w.subject); if(k>=0) subs[k]++; });
+  document.getElementById("wTotal").textContent = total;
+  subs.forEach(function(c,i){ var el=document.getElementById("wSub"+i); if(el) el.textContent=c; });
+}
+function renderWrong(){
+  var list = WRONG.filter(function(w){ return curWFilter==="all" || w.subject===curWFilter; });
+  var html = list.map(function(w){
+    var k = SUBJECTS.indexOf(w.subject);
+    var ic = ["👂","📖","🔤","✍️","🀄"][k>=0?k:0];
+    return '<div class="job-card" onclick="openWrong('+WRONG.indexOf(w)+')">'
+      + '<div class="job-top"><div class="job-title"><span class="company">'+ic+' '+esc(w.subject||"未分类")+'</span><span class="pos">'+(w.source?'出处：'+esc(w.source):'')+'</span></div></div>'
+      + '<div class="job-meta">📝 '+esc(w.summary)+'</div>'
+      + (w.analysis?'<div class="job-meta" style="color:var(--pink-deep)">💡 '+esc(w.analysis)+'</div>':'')
+      + '<div class="job-tags"><span class="status '+(k===0?'interview':k===1?'done':'warn')+'">'+esc(w.status||"待复习")+'</span></div></div>';
+  }).join("");
+  document.getElementById("wrongList").innerHTML = html || '<div class="card" style="text-align:center;color:var(--muted)">🐾 还没有错题，继续保持！</div>';
+}
+function openWrong(i){
+  var w = WRONG[i]; if(!w) return;
+  setModal('<h2>❌ '+esc(w.subject||"未分类")+'</h2>'
+    + (w.source?'<div class="m-sub">出处：'+esc(w.source)+'</div>':'')
+    + '<div class="m-sec">📝 错题简述</div><p style="font-size:13.5px">'+esc(w.summary)+'</p>'
+    + (w.analysis?'<div class="m-sec">💡 错因分析与心得</div><p style="font-size:13.5px;color:var(--muted)">'+esc(w.analysis)+'</p>':'')
+    + '<div class="m-sec">📌 状态</div><p style="font-size:13.5px">'+esc(w.status||"待复习")+'</p>');
+}
+
+/* ---------- 分项训练 ---------- */
+function renderSkills(){
+  var html = SKILLS.map(function(s,i){
+    return '<div class="kb-card '+s.cls+'" onclick="openSkill('+i+')"><div class="ic">'+s.icon+'</div><div class="kn">'+esc(s.title)+'</div><div class="kd">'+esc(s.desc||"")+'</div><span class="ncount">'+esc(s.goal||"")+'</span></div>';
+  }).join("");
+  document.getElementById("skillGrid").innerHTML = html || '<div class="card" style="text-align:center;color:var(--muted)">🐾 暂无分项资料</div>';
+}
+function openSkill(i){
+  var s = SKILLS[i]; if(!s) return;
+  setModal('<h2>'+s.icon+' '+esc(s.title)+'</h2><div class="note-body" style="margin-top:12px">'+(s.html||'<p>暂无内容</p>')+'</div>');
+}
+
+/* ---------- 资料 ---------- */
+function renderMaterials(){
+  var html = MATS.map(function(g){
+    var items = g.items.map(function(m){
+      return '<div class="cmp-card" style="display:flex;flex-direction:column;gap:6px"><div class="cn">'+esc(m.title)+'</div>'
+        + (m.desc?'<div class="why">'+esc(m.desc)+'</div>':'')
+        + (m.url?'<a class="pill g" style="text-align:center;margin-top:4px" href="'+esc(m.url)+'" target="_blank">🔗 打开资料</a>':'')
+        + '</div>';
+    }).join("");
+    return '<div class="cmp-sec"><h3>'+esc(g.cat)+'</h3><div class="cmp-grid">'+items+'</div></div>';
+  }).join("");
+  document.getElementById("matList").innerHTML = html || '<div class="card" style="text-align:center;color:var(--muted)">🐾 暂无资料</div>';
+}
+
+/* ---------- 知识库 ---------- */
+var KB_FLAT = [];
+function flattenKb(){
+  KB_FLAT = [];
+  KBS.forEach(function(k){
+    (k.groups||[{title:"", notes:k.notes||[]}]).forEach(function(g){
+      (function walk(ns){ ns.forEach(function(n){ if(n.children){ walk(n.children); } else { KB_FLAT.push(n); } }); })(g.notes||[]);
+    });
+  });
+}
+function kbNoteItem(n){
+  var idx = KB_FLAT.indexOf(n);
+  return '<div class="note-item" onclick="openKbNote('+idx+')"><span class="ni-ic">'+esc(n.icon)+'</span>'+esc(n.title)+'<span class="ni-more">打开 →</span></div>';
+}
+function countNotes(ns){ var c=0; (ns||[]).forEach(function(n){ c += n.children ? countNotes(n.children) : 1; }); return c; }
+function renderKb(){
+  document.getElementById("kbGrid").innerHTML = KBS.map(function(k,i){
+    var cnt = 0;
+    (k.groups||[{title:"", notes:k.notes||[]}]).forEach(function(g){ cnt += countNotes(g.notes); });
+    return '<div class="kb-card '+k.cls+'" onclick="openKb('+i+')"><div class="ic">'+k.icon+'</div><div class="kn">'+esc(k.name)+'</div><div class="kd">'+esc(k.desc)+'</div><span class="ncount">'+cnt+' 项</span></div>';
+  }).join("");
+}
+function renderNotes(ns){
+  return (ns||[]).map(function(n){
+    if(n.children){
+      return '<div class="kb-folder"><div class="kf-name">'+n.icon+' '+esc(n.title)+'</div>'+renderNotes(n.children)+'</div>';
+    }
+    return kbNoteItem(n);
+  }).join("");
+}
+function openKb(i){
+  var k = KBS[i];
+  var html = "";
+  (k.groups||[{title:"", notes:k.notes||[]}]).forEach(function(g){
+    if(g.title) html += '<div class="kb-section">'+esc(g.title)+'</div>';
+    var items = renderNotes(g.notes);
+    html += items || '<div style="color:var(--muted);font-size:13px;margin:4px 0">（空）🐾</div>';
+  });
+  setModal('<h2>'+k.icon+' '+esc(k.name)+'</h2><div class="m-sub">'+esc(k.desc)+' · 点击查看</div>'+(html||'<div class="m-sub">这个文件夹还没有内容 🐾</div>'));
+}
+function openKbNote(idx){
+  var n = KB_FLAT[idx];
+  if(!n) return;
+  setModal('<h2>'+n.icon+' '+esc(n.title)+'</h2><div style="margin-top:12px" class="note-body">'+(n.html||'<p>暂无内容</p>')+'</div>');
+}
+
+/* ---------- 全局搜索 ---------- */
+function plainText(html){ var d=document.createElement("div"); d.innerHTML=html||""; return (d.textContent||"").replace(/\s+/g," ").trim(); }
+var GSEARCH_IDX=null, gsList=[];
+function buildSearchIndex(){
+  var idx=[];
+  WORDS.forEach(function(w){ idx.push({type:"生词",icon:"📖",title:w.word,sub:w.meaning,keys:(w.word+" "+w.meaning).toLowerCase(),open:function(){closeModal();go("vocab");openWord(WORDS.indexOf(w));}}); });
+  WRONG.forEach(function(w){ idx.push({type:"错题",icon:"❌",title:(w.subject||"")+" · "+w.summary,sub:(w.source||""),keys:(w.subject+" "+w.summary+" "+w.source).toLowerCase(),open:function(){closeModal();go("wrong");openWrong(WRONG.indexOf(w));}}); });
+  SKILLS.forEach(function(s){ idx.push({type:"训练",icon:s.icon,title:s.title,sub:s.desc||"",keys:(s.title+" "+(s.desc||"")).toLowerCase(),open:function(){closeModal();go("skills");openSkill(SKILLS.indexOf(s));}}); });
+  MATS.forEach(function(g){ g.items.forEach(function(m){ idx.push({type:"资料",icon:"📎",title:m.title,sub:g.cat,keys:(m.title+g.cat).toLowerCase(),open:function(){closeModal();go("materials");}}); }); });
+  KBS.forEach(function(k){
+    (k.groups||[{title:"",notes:k.notes||[]}]).forEach(function(g){
+      (function walk(ns){ ns.forEach(function(n){ if(n.children){ walk(n.children); } else {
+        var txt=plainText(n.html);
+        idx.push({type:"笔记",icon:n.icon||"📄",title:n.title,sub:txt.slice(0,60),keys:(n.title+" "+txt).toLowerCase(),open:function(){closeModal();go("knowledge");openKbNote(KB_FLAT.indexOf(n));}});
+      } }); })(g.notes||[]);
+    });
+  });
+  return idx;
+}
+function openGlobalSearch(){
+  if(!GSEARCH_IDX) GSEARCH_IDX = buildSearchIndex();
+  setModal('<h2>🔍 全局搜索</h2><div class="m-sub">搜生词 / 错题 / 笔记 / 资料</div>'
+    + '<div class="search" style="margin-bottom:12px"><span>🔍</span><input id="gsInput" placeholder="输入关键词，如：abandon / 听力 / 翻译…" autofocus></div>'
+    + '<div id="gsResults"></div>');
+  var inp = document.getElementById("gsInput");
+  function doSearch(){
+    var q=(inp.value||"").toLowerCase();
+    gsList = q ? GSEARCH_IDX.filter(function(x){return x.keys.indexOf(q)>=0;}) : [];
+    var html = gsList.slice(0,30).map(function(x,i){
+      return '<div class="note-item" onclick="gsOpen('+i+')"><span class="ni-ic">'+x.icon+'</span><div style="flex:1;min-width:0"><div style="font-weight:800;font-size:13.5px">'+esc(x.title)+'</div><div style="font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(x.sub)+'</div></div><span style="font-size:11px;color:var(--pink-deep);background:var(--pink-soft);padding:2px 8px;border-radius:20px;flex-shrink:0">'+x.type+'</span></div>';
+    }).join("");
+    document.getElementById("gsResults").innerHTML = q ? (html||'<div style="text-align:center;color:var(--muted);padding:20px">🐾 没有找到相关结果</div>') : '<div style="text-align:center;color:var(--muted);padding:20px">输入关键词开始搜索～</div>';
+  }
+  inp.addEventListener("input", doSearch);
+  inp.addEventListener("keydown", function(e){ if(e.key==="Enter") doSearch(); });
+  setTimeout(function(){ inp.focus(); },100);
+  doSearch();
+}
+function gsOpen(i){ var x=gsList[i]; if(x && x.open) x.open(); }
+
+/* ---------- 头像 & 背景 ---------- */
+var BG_IMGS=IMGS.bg||{}, AV_IMGS=IMGS.av||{};
+var savedBg=Object.keys(BG_IMGS)[0]||"img1", savedAv=Object.keys(AV_IMGS)[0]||"img1";
+try{ savedBg=localStorage.getItem("cet6_bg")||Object.keys(BG_IMGS)[0]||"img1"; savedAv=localStorage.getItem("cet6_av")||Object.keys(AV_IMGS)[0]||"img1"; }catch(e){}
+function applyBg(){ document.documentElement.style.setProperty("--bg-img","url('"+BG_IMGS[savedBg]+"')"); }
+function applyAv(){ var a=document.getElementById("avatarImg"); if(a) a.src=AV_IMGS[savedAv]; }
+function pickHtml(type,imgs,cur){
+  var h='<div class="pick-grid">';
+  Object.keys(imgs).forEach(function(k){
+    h+='<div class="pick-item '+(type==="Av"?"av":"")+(k===cur?" active":"")+'" onclick="set'+type+'(\''+k+'\')"><img src="'+imgs[k]+'" alt=""><div class="pn">'+(k==="img1"?"图1":k==="img2"?"图2":k==="img3"?"图3":"图4")+'</div></div>';
+  });
+  return h+'</div>';
+}
+function openPersonalize(){
+  setModal('<h2>🐱 换个风格</h2><div class="m-sub">点下面的图片，实时换背景和头像，你的选择会被记住</div>'
+    + '<div class="pick-sec"><div class="m-sec">🖼️ 背景图</div>'+pickHtml("Bg",BG_IMGS,savedBg)+'</div>'
+    + '<div class="pick-sec"><div class="m-sec">😺 小头像</div>'+pickHtml("Av",AV_IMGS,savedAv)+'</div>');
+}
+function setBg(k){ savedBg=k; try{localStorage.setItem("cet6_bg",k);}catch(e){} applyBg(); openPersonalize(); }
+function setAv(k){ savedAv=k; try{localStorage.setItem("cet6_av",k);}catch(e){} applyAv(); openPersonalize(); }
+
+/* ---------- 页面切换 ---------- */
+var TITLES={home:"🎯 备考看板",vocab:"📖 词汇",wrong:"❌ 错题本",skills:"🎓 分项训练",materials:"📎 学习资料",knowledge:"📚 知识库"};
+function go(view){
+  document.querySelectorAll(".view").forEach(function(v){ v.classList.remove("active"); });
+  var el=document.getElementById("view-"+view); if(el) el.classList.add("active");
+  document.querySelectorAll(".nav-item,.bn-item").forEach(function(n){ n.classList.toggle("active",n.getAttribute("data-go")===view); });
+  document.getElementById("pageTitle").textContent = TITLES[view]||"";
+  window.scrollTo({top:0});
+}
+document.addEventListener("click", function(e){
+  var t=e.target.closest("[data-go]");
+  if(t){ go(t.getAttribute("data-go")); }
+});
+function bindChips(id, cb){
+  document.querySelectorAll("#"+id+" .chip").forEach(function(c){
+    c.addEventListener("click", function(){
+      document.querySelectorAll("#"+id+" .chip").forEach(function(x){ x.classList.remove("active"); });
+      c.classList.add("active"); cb(c.getAttribute("data-f"));
+    });
+  });
+}
+bindChips("vchips", function(f){ curVFilter=f; renderVocab(); });
+bindChips("wchips", function(f){ curWFilter=f; renderWrong(); });
+document.getElementById("vsearch").addEventListener("input", function(e){ curVQuery=e.target.value; renderVocab(); });
+document.addEventListener("keydown", function(e){ if(e.key==="Escape") closeModal(); });
+
+/* ---------- 漂浮小元素 ---------- */
+(function(){
+  var emojis=["🐱","🐾","🎓","📖","🐟","😺","🌸","✍️"];
+  function spawn(){
+    var s=document.createElement("span");
+    s.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    s.style.left=(Math.random()*96)+"vw";
+    s.style.fontSize=(12+Math.random()*15)+"px";
+    s.style.animationDuration=(7+Math.random()*7)+"s";
+    document.getElementById("floats").appendChild(s);
+    setTimeout(function(){s.remove()},16000);
+  }
+  spawn();spawn();
+  setInterval(spawn,1500);
+})();
+
+/* ---------- 初始化 ---------- */
+(function(){
+  var upd=document.getElementById("syncText");
+  if(upd && D.updated) upd.textContent = "自动同步 · "+D.updated;
+  flattenKb();
+  renderHome(); renderVocab(); renderWrongStats(); renderWrong(); renderSkills(); renderMaterials(); renderKb();
+  applyBg(); applyAv();
+})();
+
+</script>
+<script>
+if('serviceWorker' in navigator){ window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js'); }); }
+</script>
+</body>
+</html>
