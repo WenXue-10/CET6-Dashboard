@@ -307,7 +307,7 @@ document.addEventListener("keydown", function(e){ if(e.key==="Escape") closeModa
 })();
 
 /* ================= 手机写回 · 添加/编辑 · 拍照识别 · 语音录入 ================= */
-var BRIDGE = { url:"", key:"" };
+var BRIDGE = { url:"https://1473705102-38601bi8ym.ap-shanghai.tencentscf.com", key:"0606" };
 try{ var _brid=JSON.parse(localStorage.getItem("cet6_bridge")||"null"); if(_brid&&_brid.url) BRIDGE=_brid; }catch(e){}
 
 /* ---------- 语音识别（Web Speech API，安卓 Chrome / 桌面 Chrome 支持） ---------- */

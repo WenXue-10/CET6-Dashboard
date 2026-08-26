@@ -450,14 +450,14 @@ a{color:var(--orange-deep);text-decoration:none}
 
 <script>
 window.SITE_DATA = {
- "updated": "2026-08-26 21:39",
+ "updated": "2026-08-27 02:11",
  "exam": {
   "date": "2026-12-12",
   "days": 107
  },
  "stats": {
   "days": 107,
-  "checkin": 0,
+  "checkin": 1,
   "words": 1,
   "mastered": 0,
   "wrong": 1,
@@ -505,7 +505,7 @@ window.SITE_DATA = {
   },
   {
    "day": "四",
-   "done": false
+   "done": true
   },
   {
    "day": "五",
@@ -710,7 +710,7 @@ window.SITE_DATA = {
       {
        "title": "每日任务与打卡规则",
        "icon": "📄",
-       "html": "<h1>📅 每日任务与打卡规则</h1>\n<h2>今日任务（5 项）</h2>\n<table>\n<thead>\n<tr>\n<th>任务 key</th>\n<th>名称</th>\n<th>执行建议</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>words</td>\n<td>背诵单词 100 个</td>\n<td>配合生词本/词书，滚动记忆</td>\n</tr>\n<tr>\n<td>listening</td>\n<td>听力精听 1 套</td>\n<td>精听 + 对照原文 + 跟读</td>\n</tr>\n<tr>\n<td>reading</td>\n<td>仔细阅读 2 篇</td>\n<td>计时训练，控制节奏</td>\n</tr>\n<tr>\n<td>writing</td>\n<td>写作或翻译练习 1 篇</td>\n<td>两科交替进行</td>\n</tr>\n<tr>\n<td>review</td>\n<td>复习昨日生词</td>\n<td>巩固记忆曲线</td>\n</tr>\n</tbody>\n</table>\n<h2>打卡规则</h2>\n<ul>\n<li><strong>判定</strong>：当日 5 项任务全部完成 = 当日打卡成功</li>\n<li><strong>连续打卡</strong>：从今天往前数连续有记录的天数（最多回溯 60 天）</li>\n<li><strong>完成提示</strong>：太棒了！今日任务全部完成 🎉</li>\n</ul>\n<h2>本周打卡记录</h2>\n<table>\n<thead>\n<tr>\n<th>一</th>\n<th>二</th>\n<th>三</th>\n<th>四</th>\n<th>五</th>\n<th>六</th>\n<th>日</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>☐</td>\n<td>☐</td>\n<td>☐</td>\n<td>☐</td>\n<td>☐</td>\n<td>☐</td>\n<td>☐</td>\n</tr>\n</tbody>\n</table>\n<blockquote>\n<p>[!note] 连续打卡目标\n目标坚持到考试当天，形成每日固定学习节奏。</p>\n</blockquote>"
+       "html": "<h1>📅 每日任务与打卡规则</h1>\n<h2>今日任务（5 项）</h2>\n<table>\n<thead>\n<tr>\n<th>任务 key</th>\n<th>名称</th>\n<th>执行建议</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>words</td>\n<td>背诵单词 100 个</td>\n<td>配合生词本/词书，滚动记忆</td>\n</tr>\n<tr>\n<td>listening</td>\n<td>听力精听 1 套</td>\n<td>精听 + 对照原文 + 跟读</td>\n</tr>\n<tr>\n<td>reading</td>\n<td>仔细阅读 2 篇</td>\n<td>计时训练，控制节奏</td>\n</tr>\n<tr>\n<td>writing</td>\n<td>写作或翻译练习 1 篇</td>\n<td>两科交替进行</td>\n</tr>\n<tr>\n<td>review</td>\n<td>复习昨日生词</td>\n<td>巩固记忆曲线</td>\n</tr>\n</tbody>\n</table>\n<h2>打卡规则</h2>\n<ul>\n<li><strong>判定</strong>：当日 5 项任务全部完成 = 当日打卡成功</li>\n<li><strong>连续打卡</strong>：从今天往前数连续有记录的天数（最多回溯 60 天）</li>\n<li><strong>完成提示</strong>：太棒了！今日任务全部完成 🎉</li>\n</ul>\n<h2>本周打卡记录</h2>\n<table>\n<thead>\n<tr>\n<th>一</th>\n<th>二</th>\n<th>三</th>\n<th>四</th>\n<th>五</th>\n<th>六</th>\n<th>日</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>☐</td>\n<td>☐</td>\n<td>☐</td>\n<td>☑</td>\n<td>☐</td>\n<td>☐</td>\n<td>☐</td>\n</tr>\n</tbody>\n</table>\n<blockquote>\n<p>[!note] 连续打卡目标\n目标坚持到考试当天，形成每日固定学习节奏。</p>\n</blockquote>"
       }
      ]
     }
@@ -1197,7 +1197,7 @@ document.addEventListener("keydown", function(e){ if(e.key==="Escape") closeModa
 })();
 
 /* ================= 手机写回 · 添加/编辑 · 拍照识别 · 语音录入 ================= */
-var BRIDGE = { url:"", key:"" };
+var BRIDGE = { url:"https://1473705102-38601bi8ym.ap-shanghai.tencentscf.com", key:"0606" };
 try{ var _brid=JSON.parse(localStorage.getItem("cet6_bridge")||"null"); if(_brid&&_brid.url) BRIDGE=_brid; }catch(e){}
 
 /* ---------- 语音识别（Web Speech API，安卓 Chrome / 桌面 Chrome 支持） ---------- */
