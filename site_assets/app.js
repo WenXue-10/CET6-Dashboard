@@ -76,8 +76,14 @@ function openWord(i){
     + (w.status!=="已掌握"
         ? '<button class="btn primary" onclick="markWord('+i+',\'已掌握\')">✅ 标记已掌握</button>'
         : '<button class="btn" onclick="markWord('+i+',\'学习中\')">🔄 改回学习中</button>')
+    + '<button class="btn" style="border-color:#fda4af;color:#e11d48;background:#fff1f2" onclick="deleteWord('+i+')">🗑 删除</button>'
     + '<button class="btn" onclick="closeModal()">✕ 关闭</button></div>'
-    + '<div class="m-sub" style="margin-top:10px">状态修改经写回服务同步，约 1-2 分钟生效。</div>');
+    + '<div class="m-sub" style="margin-top:10px">状态/删除经写回服务同步，约 1-2 分钟生效。</div>');
+}
+function deleteWord(i){
+  var w = WORDS[i]; if(!w) return;
+  if(!confirm('确定删除单词「'+w.word+'」吗？删除后不可恢复。')) return;
+  postBridge({action:"delete_word",word:w.word},"单词已删除");
 }
 
 /* ---------- 错题本 ---------- */

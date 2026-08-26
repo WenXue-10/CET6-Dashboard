@@ -12,8 +12,8 @@
  * 支持的 action：
  *   add_word          { word, meaning, example }           追加到 01-词汇/生词表.md
  *   set_word_status   { word, status:已掌握|学习中 }        更新生词状态
+ *   delete_word       { word }                             从 01-词汇/生词表.md 删除该单词行
  *   add_wrong         { subject, source, summary, analysis } 追加到 06-错题本/错题记录模板.md
- *   set_progress      { dim, done }                         更新 00-备考总览/备考进度目标.md 已完成数
  *   checkin           {}                                    在 00-备考总览/每日任务与打卡规则.md 标记今天 ☑
  */
 'use strict';
@@ -27,8 +27,8 @@ const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods
 const FILES = {
   add_word:        "01-词汇/生词表.md",
   set_word_status: "01-词汇/生词表.md",
+  delete_word:     "01-词汇/生词表.md",
   add_wrong:       "06-错题本/错题记录模板.md",
-  set_progress:    "00-备考总览/备考进度目标.md",
   checkin:         "00-备考总览/每日任务与打卡规则.md",
 };
 const SUBJECTS = ["听力", "阅读", "词汇", "写作", "翻译"];
@@ -112,6 +112,19 @@ function applyAction(content, action, b) {
       }
     }
     return "NOCHANGE";
+  }
+  if (action === "delete_word") {
+    const word = String(b.word || "").trim();
+    if (!word) return "NOCHANGE";
+    const lines = content.split(/\r?\n/);
+    const out = [];
+    let changed = false;
+    for (let i = 0; i < lines.length; i++) {
+      const cells = lines[i].split("|").map(c => c.trim());
+      if (cells.length >= 5 && cells[1] === word) { changed = true; continue; }
+      out.push(lines[i]);
+    }
+    return changed ? out.join("\n") : "NOCHANGE";
   }
   if (action === "add_wrong") {
     const subj = SUBJECTS.includes(b.subject) ? b.subject : "其他";
