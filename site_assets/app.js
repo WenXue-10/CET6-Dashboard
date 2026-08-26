@@ -26,6 +26,11 @@ function renderHome(){
     return '<li><input type="checkbox" data-k="'+esc(t.key)+'"><span><b>'+esc(t.name)+'</b>'+(t.advice?'<div style="font-size:12px;color:var(--muted)">'+esc(t.advice)+'</div>':'')+'</span></li>';
   }).join("");
   document.getElementById("taskList").innerHTML = th || '<li style="color:var(--muted)">暂无任务配置</li>';
+  // 任务勾选 → 全完成显示打卡按钮
+  var boxes=document.querySelectorAll("#taskList input[type=checkbox]");
+  var cwrap=document.getElementById("checkinWrap");
+  function updCheckin(){ if(cwrap) cwrap.style.display=(boxes.length&&Array.prototype.every.call(boxes,function(x){return x.checked;}))?"block":"none"; }
+  boxes.forEach(function(x){ x.addEventListener("change", updCheckin); });
   // 本周打卡
   var week = D.week||[];
   var doneN = week.filter(function(w){ return w.done; }).length;
@@ -76,7 +81,13 @@ function openWord(i){
   setModal('<h2>📖 '+esc(w.word)+'</h2>'
     + '<div class="m-sub">'+esc(w.meaning)+'</div>'
     + (w.example?'<div class="m-sec">💬 例句</div><p style="font-size:13.5px">'+esc(w.example)+'</p>':'')
-    + '<div class="m-sec">📌 状态</div><p style="font-size:13.5px">'+esc(w.status||"学习中")+' · 复习 '+esc(w.review||0)+' 次 · 上次复习 '+esc(w.last||"—")+'</p>');
+    + '<div class="m-sec">📌 状态</div><p style="font-size:13.5px">'+esc(w.status||"学习中")+' · 复习 '+esc(w.review||0)+' 次 · 上次复习 '+esc(w.last||"—")+'</p>'
+    + '<div style="display:flex;gap:8px;margin-top:14px">'
+    + (w.status!=="已掌握"
+        ? '<button class="btn primary" onclick="markWord('+i+',\'已掌握\')">✅ 标记已掌握</button>'
+        : '<button class="btn" onclick="markWord('+i+',\'学习中\')">🔄 改回学习中</button>')
+    + '<button class="btn" onclick="closeModal()">✕ 关闭</button></div>'
+    + '<div class="m-sub" style="margin-top:10px">状态修改经写回服务同步，约 1-2 分钟生效。</div>');
 }
 
 /* ---------- 错题本 ---------- */
@@ -250,6 +261,7 @@ function go(view){
   var el=document.getElementById("view-"+view); if(el) el.classList.add("active");
   document.querySelectorAll(".nav-item,.bn-item").forEach(function(n){ n.classList.toggle("active",n.getAttribute("data-go")===view); });
   document.getElementById("pageTitle").textContent = TITLES[view]||"";
+  setFab(view);
   window.scrollTo({top:0});
 }
 document.addEventListener("click", function(e){
@@ -293,3 +305,208 @@ document.addEventListener("keydown", function(e){ if(e.key==="Escape") closeModa
   renderHome(); renderVocab(); renderWrongStats(); renderWrong(); renderSkills(); renderMaterials(); renderKb();
   applyBg(); applyAv();
 })();
+
+/* ================= 手机写回 · 添加/编辑 · 拍照识别 · 语音录入 ================= */
+var BRIDGE = { url:"", key:"" };
+try{ var _brid=JSON.parse(localStorage.getItem("cet6_bridge")||"null"); if(_brid&&_brid.url) BRIDGE=_brid; }catch(e){}
+
+/* ---------- 语音识别（Web Speech API，安卓 Chrome / 桌面 Chrome 支持） ---------- */
+function startVoice(inputId, lang){
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){ toast("当前浏览器不支持语音识别，请用安卓 Chrome"); return; }
+  var r=new SR(); r.lang=lang||"zh-CN"; r.interimResults=false; r.maxAlternatives=1;
+  var btn=document.querySelector("[data-vb='"+inputId+"']");
+  if(btn){ btn.classList.add("rec"); btn.textContent="🔴"; }
+  r.onresult=function(e){
+    var t=e.results[0][0].transcript||"";
+    var inp=document.getElementById(inputId);
+    if(inp&&t){ inp.value=inp.value?inp.value+" "+t:t; }
+    toast("已识别："+t);
+  };
+  r.onend=function(){ if(btn){ btn.classList.remove("rec"); btn.textContent="🎤"; } };
+  r.onerror=function(e){ if(btn){ btn.classList.remove("rec"); btn.textContent="🎤"; } toast("语音识别失败："+(e.error||"")); };
+  try{ r.start(); }catch(e){ toast("语音识别启动失败"); }
+}
+
+/* ---------- 拍照 OCR（Tesseract.js，浏览器本地识别） ---------- */
+var _tessLoaded=false, _tessLoading=false;
+function loadTesseract(cb){
+  if(window.Tesseract){ cb(); return; }
+  if(_tessLoading) return;
+  _tessLoading=true; toast("正在加载识别引擎，首次约 5-15 秒…");
+  var s=document.createElement("script");
+  s.src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+  s.onload=function(){ _tessLoaded=true; cb(); };
+  s.onerror=function(){ _tessLoading=false; toast("识别引擎加载失败，请检查网络"); };
+  document.head.appendChild(s);
+}
+function ocrFileText(input, lang, cb){
+  var f=input.files&&input.files[0]; if(!f){ return; }
+  loadTesseract(function(){
+    Tesseract.recognize(f, lang||"eng", {}).then(function(r){ cb((r.data.text||"").trim()); })
+      .catch(function(e){ cb(null, e); });
+  });
+}
+function ocrBoxHtml(id, lines){
+  return '<div style="font-size:12.5px;font-weight:700;margin-bottom:4px">📷 识别结果：</div>'
+    + '<textarea id="'+id+'" rows="4" style="width:100%;box-sizing:border-box;font-size:13px">'+esc((lines||[]).join("\n"))+'</textarea>';
+}
+function ocrWord(input){
+  var box=document.getElementById("nw_ocr"); if(!box) return;
+  box.style.display="block";
+  box.innerHTML='<div style="font-size:12.5px;color:var(--muted)">🔍 正在识别…（首次较慢，请稍候）</div>';
+  ocrFileText(input,"eng",function(txt,err){
+    if(err){ box.innerHTML='<div style="color:var(--rose)">识别失败：'+esc(String(err))+'</div>'; return; }
+    if(!txt){ box.innerHTML='<div style="color:var(--muted)">没有识别到文字，试试更清晰、端正的图片</div>'; return; }
+    var lines=txt.split(/\n+/).map(function(s){return s.trim();}).filter(Boolean);
+    box.innerHTML=ocrBoxHtml("nw_ocr_text",lines)
+      + '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">'
+      + '<button class="pill g" onclick="ocrFillWord(1)">1行→单词</button>'
+      + '<button class="pill g" onclick="ocrFillWord(2)">2行→释义</button>'
+      + '<button class="pill g" onclick="ocrFillWord(3)">全部→例句</button>'
+      + '<button class="pill" onclick="document.getElementById(\'nw_ocr\').style.display=\'none\'">收起</button></div>';
+  });
+}
+function ocrFillWord(mode){
+  var el=document.getElementById("nw_ocr_text"); if(!el) return;
+  var lines=el.value.split(/\n+/).map(function(s){return s.trim();}).filter(Boolean);
+  if(mode===1&&lines[0]) document.getElementById("nw_word").value=lines[0];
+  else if(mode===2&&lines[1]) document.getElementById("nw_meaning").value=lines[1];
+  else if(mode===3&&lines[0]) document.getElementById("nw_example").value=lines.join(" ");
+  toast("已填入，可继续编辑");
+}
+function ocrWrong(input){
+  var box=document.getElementById("nw_ocr2"); if(!box) return;
+  box.style.display="block";
+  box.innerHTML='<div style="font-size:12.5px;color:var(--muted)">🔍 正在识别…（首次较慢，请稍候）</div>';
+  ocrFileText(input,"eng+chi_sim",function(txt,err){
+    if(err){ box.innerHTML='<div style="color:var(--rose)">识别失败：'+esc(String(err))+'</div>'; return; }
+    if(!txt){ box.innerHTML='<div style="color:var(--muted)">没有识别到文字，试试更清晰、端正的图片</div>'; return; }
+    var lines=txt.split(/\n+/).map(function(s){return s.trim();}).filter(Boolean);
+    box.innerHTML=ocrBoxHtml("nw_ocr2_text",lines)
+      + '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">'
+      + '<button class="pill g" onclick="ocrFillWrong(1)">填入错题简述</button>'
+      + '<button class="pill" onclick="document.getElementById(\'nw_ocr2\').style.display=\'none\'">收起</button></div>';
+  });
+}
+function ocrFillWrong(){
+  var el=document.getElementById("nw_ocr2_text"); if(!el) return;
+  document.getElementById("nw_summary").value=el.value.trim();
+  toast("已填入，可继续编辑");
+}
+
+/* ---------- 添加表单 ---------- */
+function fRow(id,label,inner,lang){
+  return '<div class="f-row"><label>'+label+'</label><div class="f-in">'+inner
+    + '<button type="button" class="mic" data-vb="'+id+'" onclick="startVoice(\''+id+'\',\''+(lang||"zh-CN")+'\')" title="语音录入">🎤</button></div></div>';
+}
+function openAddWord(){
+  setModal('<h2>📖 添加生词</h2><div class="m-sub">手动填，或用 🎤 语音 / 📷 拍照识别自动填入</div>'
+    + fRow("nw_word","单词 *",'<input id="nw_word" placeholder="如：abandon">','en-US')
+    + fRow("nw_meaning","释义 *",'<input id="nw_meaning" placeholder="如：v. 放弃，抛弃">','zh-CN')
+    + fRow("nw_example","例句",'<input id="nw_example" placeholder="可选">','en-US')
+    + '<div class="f-row"><label>拍照识别</label><div class="f-in"><input type="file" id="nw_file" accept="image/*" style="display:none" onchange="ocrWord(this)"><button type="button" class="mic" style="width:auto;padding:0 12px" onclick="document.getElementById(\'nw_file\').click()">📷 拍照/选图识别</button></div></div>'
+    + '<div id="nw_ocr" style="display:none;margin-top:8px"></div>'
+    + '<div style="display:flex;gap:8px;margin-top:14px"><button class="btn primary" onclick="submitWord()">💾 保存</button><button class="btn" onclick="closeModal()">✕ 取消</button></div>'
+    + '<div class="m-sub" style="margin-top:10px">保存后自动同步，约 1-2 分钟看板更新。</div>');
+}
+function openAddWrong(){
+  setModal('<h2>❌ 添加错题</h2><div class="m-sub">手动填，或用 🎤 语音 / 📷 拍照识别自动填入</div>'
+    + '<div class="f-row"><label>科目 *</label><div class="f-in"><select id="nw_subject"><option>听力</option><option>阅读</option><option>词汇</option><option>写作</option><option>翻译</option></select></div></div>'
+    + '<div class="f-row"><label>出处</label><div class="f-in"><input id="nw_source" placeholder="如：真题2024年12月"><button type="button" class="mic" onclick="startVoice(\'nw_source\',\'zh-CN\')">🎤</button></div></div>'
+    + '<div class="f-row"><label>错题简述 *</label><div class="f-in" style="align-items:stretch"><textarea id="nw_summary" rows="2" placeholder="题干 / 原文 / 我的答案…"></textarea><button type="button" class="mic" onclick="startVoice(\'nw_summary\',\'zh-CN\')">🎤</button></div></div>'
+    + '<div class="f-row"><label>错因分析</label><div class="f-in" style="align-items:stretch"><textarea id="nw_analysis" rows="2" placeholder="为什么错，下次注意…"></textarea><button type="button" class="mic" onclick="startVoice(\'nw_analysis\',\'zh-CN\')">🎤</button></div></div>'
+    + '<div class="f-row"><label>拍照识别</label><div class="f-in"><input type="file" id="nw_file2" accept="image/*" style="display:none" onchange="ocrWrong(this)"><button type="button" class="mic" style="width:auto;padding:0 12px" onclick="document.getElementById(\'nw_file2\').click()">📷 拍照/选图识别</button></div></div>'
+    + '<div id="nw_ocr2" style="display:none;margin-top:8px"></div>'
+    + '<div style="display:flex;gap:8px;margin-top:14px"><button class="btn primary" onclick="submitWrong()">💾 保存</button><button class="btn" onclick="closeModal()">✕ 取消</button></div>');
+}
+
+/* ---------- 提交到写回中转站 ---------- */
+var _fb={file:"",md:""};
+function submitWord(){
+  var w=document.getElementById("nw_word").value.trim();
+  var m=document.getElementById("nw_meaning").value.trim();
+  if(!w||!m){ toast("请填写单词和释义"); return; }
+  postBridge({action:"add_word",word:w,meaning:m,example:document.getElementById("nw_example").value.trim()},"生词已提交");
+}
+function submitWrong(){
+  var s=document.getElementById("nw_summary").value.trim();
+  if(!s){ toast("请填写错题简述"); return; }
+  postBridge({action:"add_wrong",subject:document.getElementById("nw_subject").value,source:document.getElementById("nw_source").value.trim(),summary:s,analysis:document.getElementById("nw_analysis").value.trim()},"错题已提交");
+}
+function submitProgress(){
+  var dim=document.getElementById("np_dim").value;
+  var done=document.getElementById("np_done").value.trim();
+  if(done===""){ toast("请填写已完成数量"); return; }
+  postBridge({action:"set_progress",dim:dim,done:parseInt(done,10)},"进度已更新");
+}
+function quickCheckin(){ postBridge({action:"checkin"},"打卡成功 🐾"); }
+function markWord(i,status){
+  var w=WORDS[i]; if(!w) return;
+  postBridge({action:"set_word_status",word:w.word,status:status},status==="已掌握"?"已标记掌握 ✅":"已改回学习中");
+}
+function postBridge(payload,okMsg){
+  if(!BRIDGE.url){ showFallback(payload); return; }
+  var body=JSON.stringify(Object.assign({key:BRIDGE.key},payload));
+  fetch(BRIDGE.url,{method:"POST",headers:{"Content-Type":"application/json"},body:body})
+    .then(function(r){ return r.json().catch(function(){ return {}; }); })
+    .then(function(d){
+      if(d&&d.ok){ toast((okMsg||"已提交")+"，自动同步后约 1-2 分钟更新"); setTimeout(closeModal,900); }
+      else{ toast("保存失败"); showFallback(payload); }
+    })
+    .catch(function(){ toast("服务未连接"); showFallback(payload); });
+}
+function rowTextFor(payload){
+  if(payload.action==="add_word") return "| "+payload.word+" | "+(payload.meaning||"")+" | "+(payload.example||"")+" | 学习中 | 0 | — |";
+  if(payload.action==="add_wrong") return "| "+(payload.subject||"听力")+" | "+(payload.source||"")+" | "+(payload.summary||"")+" | "+(payload.analysis||"")+" | 待复习 |";
+  if(payload.action==="set_progress") return "把「"+payload.dim+"」的已完成改为 "+payload.done;
+  if(payload.action==="checkin") return "把今天的打卡格改为 ☑";
+  return JSON.stringify(payload);
+}
+function showFallback(payload){
+  var map={add_word:"01-词汇/生词表.md",add_wrong:"06-错题本/错题记录模板.md",set_progress:"00-备考总览/备考进度目标.md",checkin:"00-备考总览/每日任务与打卡规则.md"};
+  _fb={file:map[payload.action]||"",md:rowTextFor(payload)};
+  setModal('<h2>🐾 写回服务未连接</h2>'
+    + '<div class="m-sub">看板目前是只读的。要激活手机端保存，需部署写回中转站（见知识库「99-系统与规则/写回服务部署指南.md」）。</div>'
+    + '<div style="margin:10px 0;padding:10px;background:var(--card);border:1px solid var(--line);border-radius:10px;font-size:12.5px"><b>要写入的内容：</b><pre style="white-space:pre-wrap;font-size:12px;margin:6px 0 0">'+esc(_fb.md)+'</pre></div>'
+    + '<div style="display:flex;flex-direction:column;gap:8px">'
+    + '<button class="btn primary" onclick="copyFallback()">📋 复制内容</button>'
+    + '<button class="btn" onclick="editFallback()">✏️ 在 GitHub 在线编辑</button>'
+    + '</div>'
+    + '<div class="m-sub" style="margin-top:10px;text-align:center">或把上面的内容粘贴到豆包，对我说「帮我录进知识库」</div>');
+}
+function copyFallback(){
+  var ta=document.createElement("textarea"); ta.value=_fb.md; document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); toast("已复制"); }catch(e){ toast("复制失败，请手动复制"); }
+  document.body.removeChild(ta);
+}
+function editFallback(){
+  if(!_fb.file) return;
+  window.open("https://github.com/WenXue-10/CET6-Dashboard/edit/main/"+encodeURIComponent(_fb.file), "_blank");
+}
+
+/* ---------- 浮动按钮 & 快捷操作 ---------- */
+var FAB_VIEW="home";
+function setFab(view){ FAB_VIEW=view; var f=document.getElementById("fab"); if(f) f.style.display=(view==="home"||view==="vocab"||view==="wrong")?"flex":"none"; }
+function qa(fn,ic,t,sub){
+  return '<div class="note-item" onclick="'+fn+'"><span class="ni-ic">'+ic+'</span><div style="flex:1;min-width:0"><div style="font-weight:800">'+t+'</div><div style="font-size:11.5px;color:var(--muted)">'+sub+'</div></div><span style="color:var(--muted)">→</span></div>';
+}
+function openFabMenu(){
+  if(FAB_VIEW==="vocab"){ openAddWord(); return; }
+  if(FAB_VIEW==="wrong"){ openAddWrong(); return; }
+  setModal('<h2>🐱 快捷操作</h2><div class="m-sub">手机上也能随时记</div>'
+    + qa("quickCheckin()","🐾","今日打卡","标记今天完成 ☑")
+    + qa("openQuickProgress()","📈","更新进度","五维目标已完成数")
+    + qa("openAddWord()","📖","添加生词","手动 / 拍照 / 语音")
+    + qa("openAddWrong()","❌","添加错题","手动 / 拍照 / 语音")
+  );
+}
+function openQuickProgress(){
+  var opts=(D.progress||[]).map(function(p){ return '<option value="'+esc(p.dim)+'">'+esc(p.dim)+'（当前 '+p.done+' / '+p.target+'）</option>'; }).join("");
+  if(!opts){ toast("暂无进度配置"); return; }
+  setModal('<h2>📈 更新备考进度</h2><div class="m-sub">填「已完成」总数（如单词背了 1200 个）</div>'
+    + '<div class="f-row"><label>维度</label><div class="f-in"><select id="np_dim">'+opts+'</select></div></div>'
+    + '<div class="f-row"><label>已完成</label><div class="f-in"><input id="np_done" type="number" min="0" placeholder="如：1200"></div></div>'
+    + '<div style="display:flex;gap:8px;margin-top:14px"><button class="btn primary" onclick="submitProgress()">💾 保存</button><button class="btn" onclick="closeModal()">✕ 取消</button></div>'
+  );
+}

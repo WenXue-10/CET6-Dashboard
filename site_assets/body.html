@@ -43,6 +43,7 @@
           <div class="card">
             <div class="card-head">✅ 今日任务 <small>5 项全完成 = 打卡成功</small></div>
             <ul class="todo-list" id="taskList"></ul>
+            <div id="checkinWrap" style="display:none;margin-top:10px"><button class="btn primary" onclick="quickCheckin()" style="width:100%">🐾 今日任务完成，打卡！</button></div>
             <div style="margin-top:10px;font-size:12px;color:var(--muted)" id="taskHint"></div>
           </div>
           <div class="card">
@@ -141,5 +142,6 @@
   <div class="bn-item" data-go="knowledge"><span class="ic">📚</span>知识库</div>
 </nav>
 
+<button class="fab" id="fab" onclick="openFabMenu()" title="快速添加" style="display:none">+</button>
 <div id="floats"></div>
 <div class="toast" id="toast"></div>
