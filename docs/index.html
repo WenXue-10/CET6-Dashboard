@@ -938,7 +938,15 @@ function renderHome(){
 
 /* ---------- 词汇 ---------- */
 var curVFilter="all", curVQuery="";
+function renderVocabStats(){
+  var total=WORDS.length, learning=0, mastered=0;
+  WORDS.forEach(function(w){ if(w.status==="已掌握") mastered++; else learning++; });
+  document.getElementById("vTotal").textContent = total;
+  document.getElementById("vLearning").textContent = learning;
+  document.getElementById("vMastered").textContent = mastered;
+}
 function renderVocab(){
+  renderVocabStats();
   var list = WORDS.filter(function(w){
     if(curVFilter==="learning" && w.status!=="学习中") return false;
     if(curVFilter==="mastered" && w.status!=="已掌握") return false;
