@@ -359,6 +359,10 @@ function ocrWord(input){
     if(err){ box.innerHTML='<div style="color:var(--rose)">识别失败：'+esc(String(err))+'</div>'; return; }
     if(!txt){ box.innerHTML='<div style="color:var(--muted)">没有识别到文字，试试更清晰、端正的图片</div>'; return; }
     var lines=txt.split(/\n+/).map(function(s){return s.trim();}).filter(Boolean);
+    /* 自动提取词头：词典页第一行通常是加粗的英文单词，清洗后填入“单词”栏 */
+    var hw=cleanHeadword(lines[0]);
+    var wf=document.getElementById("nw_word");
+    if(hw&&wf&&!wf.value.trim()){ wf.value=hw; toast("已自动识别单词："+hw); }
     box.innerHTML=ocrBoxHtml("nw_ocr_text",lines)
       + '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">'
       + '<button class="pill g" onclick="ocrFillWord(1)">1行→单词</button>'
@@ -366,6 +370,11 @@ function ocrWord(input){
       + '<button class="pill g" onclick="ocrFillWord(3)">全部→例句</button>'
       + '<button class="pill" onclick="document.getElementById(\'nw_ocr\').style.display=\'none\'">收起</button></div>';
   });
+}
+function cleanHeadword(s){
+  /* 从一行里抽出第一个英文单词，去掉音节点/连字符/撇号并小写，如 “trans·mit”→“transmit” */
+  var m=(s||"").match(/[A-Za-z][A-Za-z·\-']*/);
+  return m?m[0].toLowerCase().replace(/[·\-']/g,""):"";
 }
 function ocrFillWord(mode){
   var el=document.getElementById("nw_ocr_text"); if(!el) return;
